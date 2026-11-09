@@ -64,7 +64,9 @@ app = CORSMiddleware(
         "http://127.0.0.1:5181",
         "http://localhost:5181",
         "http://127.0.0.1:5182",
-        "http://localhost:5182"
+        "http://localhost:5182",
+        "http://127.0.0.1:8003",
+        "http://localhost:8003"
     ],
     allow_credentials=True,
     allow_methods=["*"],

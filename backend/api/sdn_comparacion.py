@@ -12,7 +12,8 @@ from backend.api.sdn_predicciones_enlace_v1 import (
     SolicitudPrediccionEnlaceV1, _entrada, _validar_salida, _predecir,
 )
 from backend.servicios.comparacion_rutas import (
-    DEFAULT_WEIGHTS, DEFAULT_SCALES, TARGETS, parameters, conventional, compare,
+    DEFAULT_WEIGHTS, DEFAULT_SCALES, TARGETS, parameters, conventional,
+    classical_routes, compare_four, route_groups,
 )
 
 router = APIRouter(prefix='/api/sdn', tags=['Comparacion de rutas'])
@@ -108,13 +109,15 @@ def comparison(request: ComparisonRequest):
         raise HTTPException(409,'Cambio la seleccion o la red no esta verificada.')
     try:
         weights, scales = parameters(request.pesos.model_dump(),request.escalas.model_dump())
-        _, reference = conventional(snapshot,request)
+        baseline, baseline_errors = classical_routes(snapshot, request)
+        reference = baseline['capacity']
     except ValueError as error:
         code = 409 if (snapshot.get('topology_instance_id') != request.topology_instance_id or
                        snapshot.get('graph_version') != request.graph_version) else 422
         raise HTTPException(code,str(error))
     result = {k:snapshot[k] for k in ('topologia','session_id','topology_instance_id','graph_version','selection_revision','observed_utc')}
     result.update(convencional=reference,inteligente=None,ml={'status':'unavailable'},
+        rutas=baseline, criterios_orden=['hops','delay','capacity','ml'], errores_criterios=dict(baseline_errors),
         pesos=weights,escalas=scales,criterio='QoS normalizado direccional',rules_installed=False,
         formula='w_delay*d/(d+D) + w_loss*l/(l+L) + w_capacity*C/(C+c) + w_load*t/(t+c)',
         advertencias=['Delay: suma de predicciones por enlace, no medicion extremo a extremo.',
@@ -122,8 +125,10 @@ def comparison(request: ComparisonRequest):
             'Throughput RX por enlace no se suma ni demuestra capacidad disponible.'])
     try:
         predictions, metadata = predict_snapshot(snapshot)
-        ref, intelligent = compare(snapshot,request,predictions,weights,scales)
-        result.update(convencional=ref,inteligente=intelligent,ml=dict(metadata,status='available'),
+        routes, errors = compare_four(snapshot,request,predictions,weights,scales)
+        ref, intelligent = routes['capacity'], routes['ml']
+        result.update(convencional=ref,inteligente=intelligent,rutas=routes,errores_criterios=errors,
+            ml=dict(metadata,status='available'),
             rutas_iguales=ref['ruta']==intelligent['ruta'],
             recomendacion=('Ambas rutas coinciden bajo este criterio.' if ref['ruta']==intelligent['ruta'] else
                 'La ruta inteligente minimiza el costo QoS previsto de esta ventana; no garantiza mejoras medidas.'))
@@ -143,11 +148,16 @@ def comparison(request: ComparisonRequest):
     if result['inteligente']:
         age = time.time()-result['ml']['feature_end_epoch_s']
         if not -5 <= age <= 120:
-            result.update(convencional=reference,inteligente=None,
+            result.update(convencional=reference,inteligente=None,rutas=baseline,errores_criterios=dict(baseline_errors),
                 ml={'status':'unavailable','motivo':'Las entradas expiraron durante la validacion final.'},
                 recomendacion='Ruta inteligente no disponible: faltan predicciones validas y recientes.')
             result.pop('rutas_iguales',None)
         else:
             result['ml']['input_age_s'] = age
+    result['coincidencias'] = route_groups(result['rutas'])
+    result['caminos_distintos'] = len(result['coincidencias'])
+    result['criterios_disponibles'] = sum(route is not None for route in result['rutas'].values())
+    if result['ml']['status'] != 'available':
+        result['errores_criterios']['ml'] = result['ml'].get('motivo', 'No hay predicciones válidas y recientes.')
     result['comparison_id'] = hashlib.sha256(json.dumps(result,sort_keys=True,allow_nan=False).encode()).hexdigest()[:24]
     return result

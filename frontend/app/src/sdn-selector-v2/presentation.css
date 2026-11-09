@@ -1,0 +1,65 @@
+.sdn-map-layout { display:flex; align-items:center; flex-wrap:wrap; gap:7px; margin:-4px 0 14px; }
+.sdn-map-layout button { border:1px solid #2c4962; border-radius:7px; padding:8px 12px; background:#0d1c2c; color:#9bb4cb; cursor:pointer; font-size:11px; }
+.sdn-map-layout button[aria-pressed="true"] { background:#123952; border-color:#38bdf8; color:#c3eeff; }
+.sdn-map-layout button:disabled { opacity:.45; cursor:default; }
+.sdn-map-layout > span { margin-left:auto; color:#89a7bf; font-size:10px; }
+.sdn-geography-stage { position:relative; overflow:hidden; border-radius:10px; background:#0a1728; }
+.sdn-geography-stage.is-geographic { background:radial-gradient(ellipse at 55% 45%,#102a40,#071625); border:1px solid #244158; }
+.sdn-panel-v1 .sdn-geography-stage.is-geographic .topology-canvas { height:560px; background:transparent; position:relative; z-index:1; }
+.sdn-panel-v1 .sdn-geography-stage.region-europe .topology-canvas { height:660px; }
+.sdn-geographic-backdrop { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:hidden; }
+.sdn-geographic-backdrop path { fill:#153548; stroke:#45627a; stroke-width:1.25; stroke-linejoin:round; }
+.sdn-geography-note { margin-top:13px; padding:12px 14px; border:1px solid #284057; border-radius:8px; color:#8fa9c1; font-size:10px; line-height:1.7; }
+.sdn-geography-note summary { cursor:pointer; color:#b9d0e3; }
+.sdn-geography-note p { margin:8px 0; }
+.sdn-geography-note a { color:#75c9ed; }
+.sdn-map-route-key { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; font-size:10px; }
+.sdn-map-route-key span { display:flex; align-items:center; gap:5px; }
+.sdn-map-route-key i { width:17px; height:3px; display:inline-block; }
+.sdn-comparison { margin-top:24px; border-top:1px solid #28445e; padding-top:24px; }
+.sdn-comparison h3 { margin:4px 0 8px; font-size:20px; }
+.sdn-comparison-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.sdn-four-count { font-size:10px; white-space:nowrap; padding:7px 12px; border:1px solid #305d76; background:#102d40; border-radius:20px; color:#9bdaf5; }
+.sdn-comparison form > details { margin-top:18px; color:#9db6cc; font-size:11px; }
+.sdn-qos-inputs { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-top:12px; }
+.sdn-qos-inputs label { display:grid; gap:6px; }
+.sdn-comparison .primary-button { margin-top:16px; }
+.sdn-comparison-summary { display:flex; align-items:baseline; flex-wrap:wrap; gap:10px; margin:22px 0 14px; }
+.sdn-comparison-summary strong { color:#e0eff9; font-size:18px; }
+.sdn-comparison-summary span { color:#88a5bd; font-size:11px; }
+.sdn-comparison-cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.sdn-comparison-cards article { padding:18px; border:1px solid #2b455d; border-left:4px solid var(--route-color); background:linear-gradient(135deg,#11263a,#0e1e30); border-radius:10px; min-width:0; }
+.sdn-comparison-cards article.is-unavailable { opacity:.7; }
+.sdn-route-card-heading { display:flex; align-items:center; gap:8px; color:var(--route-color); }
+.sdn-route-card-heading h4 { margin:0; font-size:13px; }
+.sdn-route-card-heading label { margin-left:auto; display:flex; align-items:center; }
+.sdn-route-card-heading input { accent-color:var(--route-color); width:16px; height:16px; cursor:pointer; }
+.sdn-route-dot { background:var(--route-color); width:8px; height:8px; border-radius:50%; display:inline-block; flex-shrink:0; margin-right:4px; }
+.sdn-route-path { color:#d4e4f0; font-size:12px; line-height:1.85; overflow-wrap:anywhere; min-height:42px; }
+.sdn-card-common-metrics { margin:14px 0; }
+.sdn-card-common-metrics > div { display:flex; justify-content:space-between; gap:14px; padding:9px 7px; border-bottom:1px solid #284057; font-size:11px; line-height:1.5; }
+.sdn-card-common-metrics dt { color:#9bb4cb; }
+.sdn-card-common-metrics dd { margin:0; color:#e0edf8; font-weight:600; text-align:right; white-space:nowrap; }
+.sdn-card-common-metrics > div.is-best { background:#12342e; }
+.sdn-card-common-metrics > div.is-best dd { color:#93e0c6; }
+.sdn-route-card-stats { display:flex; align-items:baseline; flex-wrap:wrap; justify-content:space-between; gap:8px; color:#8ba9c3; font-size:11px; }
+.sdn-route-card-stats strong { color:#c6dbea; font-size:14px; }
+.sdn-route-card-stats small { font-size:9px; font-weight:400; }
+.sdn-route-badges { display:flex; gap:5px; flex-wrap:wrap; min-height:25px; margin:12px 0 6px; }
+.sdn-route-badges span { font-size:9px; color:#93d4bc; border:1px solid #285346; background:#112f29; padding:4px 7px; border-radius:5px; }
+.sdn-route-legend { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin:16px 0; }
+.sdn-shared-key { color:#e9c16b; font-size:10px; }
+.sdn-coincidence { background:#292718; border:1px solid #57492b; border-radius:7px; padding:10px 12px; color:#dcc99a; font-size:11px; line-height:1.7; }
+.sdn-four-table { min-width:680px; margin-top:12px; }
+.sdn-four-table caption { font-size:10px; line-height:1.7; color:#8da8bf; text-align:left; padding:10px 0; }
+.sdn-four-table tbody th { font-size:10px; white-space:normal; min-width:180px; background:#102034; }
+.sdn-four-table td.sdn-best-metric { color:#93e0c6; background:#12342e; font-weight:700; }
+.sdn-comparison > details { margin-top:15px; color:#acc4d9; font-size:11px; }
+.sdn-comparison .sdn-table caption { text-align:left; color:#8ba7bf; padding:10px 0; font-size:10px; }
+@media(max-width:760px) {
+  .sdn-comparison-cards { grid-template-columns:1fr; }
+  .sdn-qos-inputs { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .sdn-map-layout > span { flex-basis:100%; margin-left:0; }
+  .sdn-panel-v1 .sdn-geography-stage.is-geographic .topology-canvas { height:430px; }
+  .sdn-panel-v1 .sdn-geography-stage.region-europe .topology-canvas { height:610px; }
+}

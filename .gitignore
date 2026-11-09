@@ -28,3 +28,8 @@ interfaz_rutas_ml_ejecucion/
 ultima_*.txt
 sesiones/
 work/
+
+# Ejecucion local de Windows
+.ejecucion_windows/
+entorno-windows.json
+VALIDACION_WINDOWS.json

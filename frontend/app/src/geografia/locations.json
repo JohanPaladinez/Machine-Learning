@@ -1,0 +1,661 @@
+{
+  "schema_version": 1,
+  "kind": "laboratory_reference",
+  "note": "Ciudades reales asignadas como referencia visual del laboratorio. La correspondencia con s1…sN no es una identificación histórica verificada.",
+  "sources": [
+    {
+      "title": "NSF: Birth of the Commercial Internet",
+      "url": "https://www.nsf.gov/impacts/internet"
+    },
+    {
+      "title": "GÉANT2 / DANTE, EGEE 2005",
+      "url": "https://indico.cern.ch/event/408143/contributions/980571/attachments/816363/1118606/GEANT2_EGEE_18_4_05_ppt.pdf"
+    },
+    {
+      "title": "BNN-UPC: topologías numeradas sin coordenadas",
+      "url": "https://github.com/BNN-UPC/DRL-ES-OTN/tree/main/dataset_Topologies"
+    }
+  ],
+  "topologies": {
+    "nsfnet": {
+      "title": "Estados Unidos",
+      "region": "usa",
+      "bounds": [
+        -127,
+        23,
+        -65,
+        51
+      ],
+      "edges": [
+        [
+          "s1",
+          "s2"
+        ],
+        [
+          "s1",
+          "s3"
+        ],
+        [
+          "s1",
+          "s4"
+        ],
+        [
+          "s10",
+          "s11"
+        ],
+        [
+          "s10",
+          "s13"
+        ],
+        [
+          "s11",
+          "s12"
+        ],
+        [
+          "s11",
+          "s14"
+        ],
+        [
+          "s12",
+          "s13"
+        ],
+        [
+          "s2",
+          "s3"
+        ],
+        [
+          "s2",
+          "s8"
+        ],
+        [
+          "s3",
+          "s6"
+        ],
+        [
+          "s4",
+          "s5"
+        ],
+        [
+          "s4",
+          "s9"
+        ],
+        [
+          "s5",
+          "s6"
+        ],
+        [
+          "s5",
+          "s7"
+        ],
+        [
+          "s13",
+          "s6"
+        ],
+        [
+          "s14",
+          "s6"
+        ],
+        [
+          "s7",
+          "s8"
+        ],
+        [
+          "s11",
+          "s8"
+        ],
+        [
+          "s10",
+          "s9"
+        ],
+        [
+          "s12",
+          "s9"
+        ]
+      ],
+      "nodes": {
+        "s1": {
+          "city": "Seattle",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "Washington",
+          "latitude": 47.6062,
+          "longitude": -122.3321,
+          "labelAlign": "right",
+          "labelValign": "top"
+        },
+        "s2": {
+          "city": "Palo Alto",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "California",
+          "latitude": 37.4419,
+          "longitude": -122.143,
+          "labelAlign": "right",
+          "labelValign": "top"
+        },
+        "s3": {
+          "city": "San Diego",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "California",
+          "latitude": 32.7157,
+          "longitude": -117.1611,
+          "labelAlign": "right",
+          "labelValign": "bottom"
+        },
+        "s4": {
+          "city": "Salt Lake City",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "Utah",
+          "latitude": 40.7608,
+          "longitude": -111.891,
+          "labelAlign": "right",
+          "labelValign": "top"
+        },
+        "s5": {
+          "city": "Boulder",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "Colorado",
+          "latitude": 40.015,
+          "longitude": -105.2705,
+          "labelAlign": "right",
+          "labelValign": "bottom"
+        },
+        "s6": {
+          "city": "Houston",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "Texas",
+          "latitude": 29.7604,
+          "longitude": -95.3698,
+          "labelAlign": "right",
+          "labelValign": "bottom"
+        },
+        "s7": {
+          "city": "Lincoln",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "Nebraska",
+          "latitude": 40.8136,
+          "longitude": -96.7026,
+          "labelAlign": "left",
+          "labelValign": "top"
+        },
+        "s8": {
+          "city": "Champaign",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "Illinois",
+          "latitude": 40.1164,
+          "longitude": -88.2434,
+          "labelAlign": "left",
+          "labelValign": "bottom"
+        },
+        "s9": {
+          "city": "Ann Arbor",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "Michigan",
+          "latitude": 42.2808,
+          "longitude": -83.743,
+          "labelAlign": "left",
+          "labelValign": "top"
+        },
+        "s10": {
+          "city": "Pittsburgh",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "Pensilvania",
+          "latitude": 40.4406,
+          "longitude": -79.9959,
+          "labelAlign": "left",
+          "labelValign": "bottom"
+        },
+        "s11": {
+          "city": "College Park",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "Maryland",
+          "latitude": 38.9897,
+          "longitude": -76.9378,
+          "labelAlign": "right",
+          "labelValign": "bottom"
+        },
+        "s12": {
+          "city": "Ithaca",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "Nueva York",
+          "latitude": 42.444,
+          "longitude": -76.5019,
+          "labelAlign": "right",
+          "labelValign": "top"
+        },
+        "s13": {
+          "city": "Princeton",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "Nueva Jersey",
+          "latitude": 40.3573,
+          "longitude": -74.6672,
+          "labelAlign": "right",
+          "labelValign": "center"
+        },
+        "s14": {
+          "city": "Atlanta",
+          "country": "Estados Unidos",
+          "countryCode": "US",
+          "state": "Georgia",
+          "latitude": 33.749,
+          "longitude": -84.388,
+          "labelAlign": "right",
+          "labelValign": "bottom"
+        }
+      }
+    },
+    "geant2": {
+      "title": "Europa",
+      "region": "europe",
+      "bounds": [
+        -12,
+        34,
+        33,
+        65
+      ],
+      "edges": [
+        [
+          "s1",
+          "s2"
+        ],
+        [
+          "s1",
+          "s3"
+        ],
+        [
+          "s10",
+          "s11"
+        ],
+        [
+          "s10",
+          "s13"
+        ],
+        [
+          "s10",
+          "s14"
+        ],
+        [
+          "s11",
+          "s14"
+        ],
+        [
+          "s12",
+          "s15"
+        ],
+        [
+          "s12",
+          "s21"
+        ],
+        [
+          "s13",
+          "s14"
+        ],
+        [
+          "s13",
+          "s20"
+        ],
+        [
+          "s13",
+          "s22"
+        ],
+        [
+          "s15",
+          "s16"
+        ],
+        [
+          "s16",
+          "s17"
+        ],
+        [
+          "s17",
+          "s18"
+        ],
+        [
+          "s18",
+          "s19"
+        ],
+        [
+          "s19",
+          "s22"
+        ],
+        [
+          "s10",
+          "s2"
+        ],
+        [
+          "s2",
+          "s4"
+        ],
+        [
+          "s2",
+          "s7"
+        ],
+        [
+          "s20",
+          "s24"
+        ],
+        [
+          "s22",
+          "s23"
+        ],
+        [
+          "s23",
+          "s24"
+        ],
+        [
+          "s3",
+          "s4"
+        ],
+        [
+          "s3",
+          "s5"
+        ],
+        [
+          "s4",
+          "s6"
+        ],
+        [
+          "s4",
+          "s7"
+        ],
+        [
+          "s5",
+          "s8"
+        ],
+        [
+          "s6",
+          "s9"
+        ],
+        [
+          "s10",
+          "s7"
+        ],
+        [
+          "s7",
+          "s9"
+        ],
+        [
+          "s12",
+          "s8"
+        ],
+        [
+          "s8",
+          "s9"
+        ],
+        [
+          "s12",
+          "s9"
+        ],
+        [
+          "s13",
+          "s9"
+        ],
+        [
+          "s18",
+          "s9"
+        ],
+        [
+          "s19",
+          "s9"
+        ],
+        [
+          "s21",
+          "s9"
+        ]
+      ],
+      "nodes": {
+        "s1": {
+          "city": "Dublín",
+          "country": "Irlanda",
+          "countryCode": "IE",
+          "state": "",
+          "latitude": 53.3498,
+          "longitude": -6.2603,
+          "labelAlign": "left",
+          "labelValign": "top"
+        },
+        "s2": {
+          "city": "Londres",
+          "country": "Reino Unido",
+          "countryCode": "GB",
+          "state": "",
+          "latitude": 51.5074,
+          "longitude": -0.1278,
+          "labelAlign": "left",
+          "labelValign": "center"
+        },
+        "s3": {
+          "city": "Oslo",
+          "country": "Noruega",
+          "countryCode": "NO",
+          "state": "",
+          "latitude": 59.9139,
+          "longitude": 10.7522,
+          "labelAlign": "left",
+          "labelValign": "top"
+        },
+        "s4": {
+          "city": "Ámsterdam",
+          "country": "Países Bajos",
+          "countryCode": "NL",
+          "state": "",
+          "latitude": 52.3676,
+          "longitude": 4.9041,
+          "labelAlign": "right",
+          "labelValign": "top"
+        },
+        "s5": {
+          "city": "Helsinki",
+          "country": "Finlandia",
+          "countryCode": "FI",
+          "state": "",
+          "latitude": 60.1699,
+          "longitude": 24.9384,
+          "labelAlign": "right",
+          "labelValign": "top"
+        },
+        "s6": {
+          "city": "Copenhague",
+          "country": "Dinamarca",
+          "countryCode": "DK",
+          "state": "",
+          "latitude": 55.6761,
+          "longitude": 12.5683,
+          "labelAlign": "left",
+          "labelValign": "bottom"
+        },
+        "s7": {
+          "city": "Bruselas",
+          "country": "Bélgica",
+          "countryCode": "BE",
+          "state": "",
+          "latitude": 50.8503,
+          "longitude": 4.3517,
+          "labelAlign": "left",
+          "labelValign": "bottom"
+        },
+        "s8": {
+          "city": "Estocolmo",
+          "country": "Suecia",
+          "countryCode": "SE",
+          "state": "",
+          "latitude": 59.3293,
+          "longitude": 18.0686,
+          "labelAlign": "right",
+          "labelValign": "bottom"
+        },
+        "s9": {
+          "city": "Fráncfort",
+          "country": "Alemania",
+          "countryCode": "DE",
+          "state": "",
+          "latitude": 50.1109,
+          "longitude": 8.6821,
+          "labelAlign": "right",
+          "labelValign": "center"
+        },
+        "s10": {
+          "city": "París",
+          "country": "Francia",
+          "countryCode": "FR",
+          "state": "",
+          "latitude": 48.8566,
+          "longitude": 2.3522,
+          "labelAlign": "left",
+          "labelValign": "bottom"
+        },
+        "s11": {
+          "city": "Lisboa",
+          "country": "Portugal",
+          "countryCode": "PT",
+          "state": "",
+          "latitude": 38.7223,
+          "longitude": -9.1393,
+          "labelAlign": "right",
+          "labelValign": "top"
+        },
+        "s12": {
+          "city": "Varsovia",
+          "country": "Polonia",
+          "countryCode": "PL",
+          "state": "",
+          "latitude": 52.2297,
+          "longitude": 21.0122,
+          "labelAlign": "right",
+          "labelValign": "center"
+        },
+        "s13": {
+          "city": "Zúrich",
+          "country": "Suiza",
+          "countryCode": "CH",
+          "state": "",
+          "latitude": 47.3769,
+          "longitude": 8.5417,
+          "labelAlign": "left",
+          "labelValign": "bottom"
+        },
+        "s14": {
+          "city": "Madrid",
+          "country": "España",
+          "countryCode": "ES",
+          "state": "",
+          "latitude": 40.4168,
+          "longitude": -3.7038,
+          "labelAlign": "right",
+          "labelValign": "bottom"
+        },
+        "s15": {
+          "city": "Vilna",
+          "country": "Lituania",
+          "countryCode": "LT",
+          "state": "",
+          "latitude": 54.6872,
+          "longitude": 25.2797,
+          "labelAlign": "right",
+          "labelValign": "top"
+        },
+        "s16": {
+          "city": "Riga",
+          "country": "Letonia",
+          "countryCode": "LV",
+          "state": "",
+          "latitude": 56.9496,
+          "longitude": 24.1052,
+          "labelAlign": "left",
+          "labelValign": "center"
+        },
+        "s17": {
+          "city": "Tallin",
+          "country": "Estonia",
+          "countryCode": "EE",
+          "state": "",
+          "latitude": 59.437,
+          "longitude": 24.7536,
+          "labelAlign": "right",
+          "labelValign": "center"
+        },
+        "s18": {
+          "city": "Praga",
+          "country": "Chequia",
+          "countryCode": "CZ",
+          "state": "",
+          "latitude": 50.0755,
+          "longitude": 14.4378,
+          "labelAlign": "right",
+          "labelValign": "top"
+        },
+        "s19": {
+          "city": "Viena",
+          "country": "Austria",
+          "countryCode": "AT",
+          "state": "",
+          "latitude": 48.2082,
+          "longitude": 16.3738,
+          "labelAlign": "right",
+          "labelValign": "bottom"
+        },
+        "s20": {
+          "city": "Roma",
+          "country": "Italia",
+          "countryCode": "IT",
+          "state": "",
+          "latitude": 41.9028,
+          "longitude": 12.4964,
+          "labelAlign": "right",
+          "labelValign": "bottom"
+        },
+        "s21": {
+          "city": "Luxemburgo",
+          "country": "Luxemburgo",
+          "countryCode": "LU",
+          "state": "",
+          "latitude": 49.6116,
+          "longitude": 6.1319,
+          "labelAlign": "right",
+          "labelValign": "bottom"
+        },
+        "s22": {
+          "city": "Budapest",
+          "country": "Hungría",
+          "countryCode": "HU",
+          "state": "",
+          "latitude": 47.4979,
+          "longitude": 19.0402,
+          "labelAlign": "right",
+          "labelValign": "center"
+        },
+        "s23": {
+          "city": "Atenas",
+          "country": "Grecia",
+          "countryCode": "GR",
+          "state": "",
+          "latitude": 37.9838,
+          "longitude": 23.7275,
+          "labelAlign": "right",
+          "labelValign": "bottom"
+        },
+        "s24": {
+          "city": "Liubliana",
+          "country": "Eslovenia",
+          "countryCode": "SI",
+          "state": "",
+          "latitude": 46.0569,
+          "longitude": 14.5058,
+          "labelAlign": "left",
+          "labelValign": "bottom"
+        }
+      }
+    }
+  }
+}

@@ -1,14 +1,15 @@
 
 import json
-from urllib.request import urlopen
+import os
+from urllib.request import ProxyHandler, build_opener
 from fastapi import APIRouter, HTTPException
 
 router = APIRouter(prefix="/api/sdn/ml", tags=["Modelo comun ML"])
-SERVICIO = "http://192.168.56.108:8010"
+SERVICIO = os.environ.get("SDN_MODELO_URL", "http://192.168.56.108:8010").rstrip("/")
 
 def consultar(ruta):
     try:
-        with urlopen(SERVICIO + ruta, timeout=5) as respuesta:
+        with build_opener(ProxyHandler({})).open(SERVICIO + ruta, timeout=5) as respuesta:
             contenido = respuesta.read(1048577)
         if len(contenido) > 1048576:
             raise ValueError("Respuesta demasiado grande")

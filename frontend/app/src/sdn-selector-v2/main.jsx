@@ -5,6 +5,7 @@ import "../index.css";
 import "../App.css";
 import "../sdn-vivo-v1/panel.css";
 import "../sdn-vivo-v1/live.css";
+import "./presentation.css";
 import SelectorRoot from "./SelectorRoot.jsx";
 
 createRoot(document.getElementById("root")).render(

@@ -10,6 +10,12 @@ TARGETS = {
     'u_to_v': ('target_throughput_u_to_v_mbps', 'target_u_to_v_delay_avg_ms', 'target_u_to_v_loss_ratio'),
     'v_to_u': ('target_throughput_v_to_u_mbps', 'target_v_to_u_delay_avg_ms', 'target_v_to_u_loss_ratio'),
 }
+CRITERIA = {
+    'hops': ('Menos saltos', 'saltos'),
+    'delay': ('Retardo configurado', 'ms'),
+    'capacity': ('Inverso de capacidad', 'Σ 1/Mbps'),
+    'ml': ('Predicción ML', 'QoS normalizado'),
+}
 
 
 def finite(value, positive=False):
@@ -55,9 +61,14 @@ def summarize(snapshot, path, directed=None):
     for e in profile['links']:
         pairs[(e['switch_u'],e['switch_v'])] = pairs[(e['switch_v'],e['switch_u'])] = e
     edges = [pairs[(a,b)] for a,b in zip(path,path[1:])]
+    configured = [e.get('configured_delay_ms') for e in edges]
+    configured_total = None
+    if all(isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) and v >= 0 for v in configured):
+        configured_total = finite(sum(configured))
     result = {'ruta':path, 'saltos':len(edges), 'edge_ids':[e['link_id'] for e in edges],
               'costo_referencia':finite(sum(calcular_costo_capacidad(e['capacity_mbps']) for e in edges)),
               'capacidad_minima_mbps':min(e['capacity_mbps'] for e in edges),
+              'retardo_configurado_total_ms':configured_total,
               'costo_qos':None, 'delay_previsto_ms':None, 'loss_previsto_ratio':None,
               'predicciones_enlaces':[]}
     if directed is not None:
@@ -69,8 +80,46 @@ def summarize(snapshot, path, directed=None):
     return result
 
 
-def compare(snapshot, request, predictions, weights, scales):
-    args, _ = conventional(snapshot, request)
+def classical_routes(snapshot, request):
+    # La referencia valida también la identidad, los extremos y las capacidades.
+    conventional(snapshot, request)
+    routes, errors = {}, {}
+    for criterion in ('hops', 'delay', 'capacity'):
+        try:
+            if criterion == 'delay':
+                active = {e['id'] for e in snapshot['links_runtime'] if e.get('state') == 'up'}
+                profile = snapshot['topology_document']['topologies'][snapshot['topologia']]
+                for edge in profile['links']:
+                    if edge['link_id'] in active:
+                        finite(edge.get('configured_delay_ms'))
+            args = route_inputs(snapshot, request.topology_instance_id, request.graph_version,
+                                request.origen, request.destino, criterion, calcular_costo_capacidad)
+            path, cost = calcular_ruta(**args)
+            item = summarize(snapshot, path)
+            item.update(criterio=criterion, nombre=CRITERIA[criterion][0],
+                        unidad_costo=CRITERIA[criterion][1], costo_criterio=finite(cost))
+            routes[criterion] = item
+        except (ValueError, KeyError, TypeError, OverflowError) as error:
+            if criterion != 'delay':
+                raise ValueError(str(error)) from error
+            routes[criterion] = None
+            errors[criterion] = 'No hay retardo configurado válido para calcular este criterio.'
+    routes['ml'] = None
+    return routes, errors
+
+
+def route_groups(routes):
+    groups = {}
+    for key, route in routes.items():
+        if route is not None:
+            groups.setdefault(tuple(route['ruta']), []).append(key)
+    return [{'criterios': keys, 'ruta': list(path)} for path, keys in groups.items()]
+
+
+def compare_four(snapshot, request, predictions, weights, scales):
+    routes, errors = classical_routes(snapshot, request)
+    args = route_inputs(snapshot, request.topology_instance_id, request.graph_version,
+                        request.origen, request.destino, 'capacity', calcular_costo_capacidad)
     active = {e['id'] for e in snapshot['links_runtime'] if e.get('state') == 'up'}
     profile = snapshot['topology_document']['topologies'][snapshot['topologia']]
     directed, weighted = {}, []
@@ -86,7 +135,20 @@ def compare(snapshot, request, predictions, weights, scales):
                 'direccion':direction, 'throughput_rx_mbps':t, 'delay_ms':d, 'loss_ratio':l,
                 'costo_qos':cost, 'componentes':components}
             weighted.append({'origen':a,'destino':b,'costo':cost})
-    conventional_path,_ = calcular_ruta(**args)
-    intelligent_path,_ = calcular_ruta(nodos=args['nodos'], enlaces=weighted,
+    intelligent_path, intelligent_cost = calcular_ruta(nodos=args['nodos'], enlaces=weighted,
         origen=request.origen,destino=request.destino,dirigido=True)
-    return summarize(snapshot,conventional_path,directed), summarize(snapshot,intelligent_path,directed)
+    for key, route in list(routes.items()):
+        if route is not None:
+            enriched = summarize(snapshot, route['ruta'], directed)
+            enriched.update({k: route[k] for k in ('criterio', 'nombre', 'unidad_costo', 'costo_criterio')})
+            routes[key] = enriched
+    routes['ml'] = summarize(snapshot, intelligent_path, directed)
+    routes['ml'].update(criterio='ml', nombre=CRITERIA['ml'][0],
+                        unidad_costo=CRITERIA['ml'][1], costo_criterio=finite(intelligent_cost))
+    return routes, errors
+
+
+def compare(snapshot, request, predictions, weights, scales):
+    # Mantiene el contrato anterior para los clientes de dos rutas.
+    routes, _ = compare_four(snapshot, request, predictions, weights, scales)
+    return routes['capacity'], routes['ml']

@@ -6,7 +6,7 @@ import time
 from collections import OrderedDict
 from datetime import datetime
 from urllib.error import HTTPError
-from urllib.request import Request, urlopen
+from urllib.request import Request, ProxyHandler, build_opener
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -96,7 +96,7 @@ def _predecir(entrada):
     peticion = Request(SERVICIO + "/predict", data=json.dumps(entrada, allow_nan=False).encode("utf-8"),
                        headers={"Content-Type": "application/json"})
     try:
-        with urlopen(peticion, timeout=8) as respuesta:
+        with build_opener(ProxyHandler({})).open(peticion, timeout=8) as respuesta:
             cuerpo = respuesta.read(65537)
         if len(cuerpo) > 65536:
             raise ValueError("Respuesta demasiado grande")

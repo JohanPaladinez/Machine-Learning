@@ -1,70 +1,88 @@
-# SDN/KDN — comparación de rutas NSFNET y GEANT2
+# Machine Learning — SDN/KDN
 
-[![Validación](https://github.com/Sergio777gg/sdn-kdn-rutas-ml/actions/workflows/validacion.yml/badge.svg)](https://github.com/Sergio777gg/sdn-kdn-rutas-ml/actions/workflows/validacion.yml)
+Proyecto de visualización y comparación de rutas sobre NSFNET y GEANT2, con RYU y Mininet en máquinas virtuales y la interfaz ejecutándose directamente en Windows.
 
-Ampliación del proyecto existente FastAPI/React/RYU/Mininet. Compara Dijkstra con costo inverso de capacidad y Dijkstra dirigido con costos QoS basados en las predicciones del modelo común existente. No reentrena el modelo ni instala forwarding al comparar.
+## Versión actual
 
-## Estado de esta entrega
+- Selección de NSFNET o GEANT2 y verificación de la red observada en Mininet/Ryu.
+- Mapas geográficos y esquemas de red, con ciudades de referencia e inspección de nodos y enlaces.
+- Cuatro criterios: menor número de saltos, menor retardo configurado, inverso de capacidad nominal y ruta con métricas previstas por ML.
+- Las cuatro tarjetas y la tabla presentan los mismos siete indicadores: saltos, retardo configurado, inverso de capacidad, QoS previsto, delay previsto, pérdida prevista y capacidad mínima nominal.
+- Colores por criterio, enlaces compartidos, caminos coincidentes y controles para aislar trazados.
+- Predicciones por enlace de la siguiente ventana, con comprobación de identidad, entradas completas y antigüedad máxima de 120 segundos.
 
-- Código activado en `/home/vboxuser/proyecto_nsfnet` de la VM de interfaz, con autorización del usuario.
-- Versión de validación: backend `127.0.0.1:8003`; panel `http://127.0.0.1:5182/sdn-selector.html` dentro de esa VM.
-- Versión habitual activada: FastAPI `127.0.0.1:8002` y panel `http://127.0.0.1:5181/sdn-selector.html`. Se reiniciaron únicamente FastAPI y Vite; RYU, ML y recolectores conservaron sus procesos originales.
-- 23 pruebas automáticas aprobadas, incluidas las originales; comparación real aprobada para ambas topologías. Evidencias en `evidencias/`.
-- Frontend compilado y archivos modificados aprobados por ESLint. Revisión visual e interacción completa pendientes: Computer Use se detuvo al no poder verificar la URL del navegador.
-- Repositorio público: [Sergio777gg/sdn-kdn-rutas-ml](https://github.com/Sergio777gg/sdn-kdn-rutas-ml).
+La comparación calcula caminos; no instala reglas ni demuestra una mejora de rendimiento del tráfico real. Las métricas previstas se distinguen de las medidas y de los valores configurados. Las ciudades son ubicaciones reales asignadas como referencias visuales del laboratorio: su asociación con s1…sN no es una identificación histórica verificada. Los IDs y conexiones originales se conservan.
 
-## Uso
+## Ejecutar en Windows
 
-1. Abrir `http://127.0.0.1:5181/sdn-selector.html` en la VM de interfaz.
-2. Pulsar NSFNET o GEANT2. No escribir IP ni puertos del observador.
-3. Esperar «Red activa verificada». Revisar telemetría y disponibilidad del modelo por separado.
-4. Ir a **Enrutamiento**, elegir origen y destino. Para la tarjeta individual, seleccionar **Ruta inteligente (ML)** en **Criterio de la ruta** y pulsar **Calcular ruta inteligente**. Para evaluar las dos alternativas juntas, pulsar **Comparar rutas**.
-5. Revisar trayectos, costos bajo ambas fórmulas, delay previsto, loss compuesto y capacidad mínima nominal. Se indica si los caminos coinciden.
-6. Usar las casillas para ocultar o mostrar trazados sin recalcular. Azul continuo = convencional; violeta discontinuo = ML; dorado punteado = tramos compartidos.
-7. Abrir las predicciones por enlace de cada ruta. Esas tablas conservan la ventana de la comparación; al seleccionar el enlace, el inspector existente puede mostrar una ventana más nueva.
+Requisitos: Python 3.10 o posterior y Node.js compatible con Vite 8 (22.12 o posterior; también se admite la rama 20 desde 20.19). Git es necesario para clonar.
 
-La comparación no aplica las rutas al tráfico. Si las entradas faltan o caducan, solo se ofrece el cálculo convencional. El panel retira resultados ML a los 120 segundos desde el final de la ventana de entrada. Las predicciones son para la próxima ventana.
+Después de clonar, abre PowerShell en esta carpeta y ejecuta:
 
-## Archivos principales
+```powershell
+python instalar_windows.py
+.\Abrir_interfaz.cmd
+```
 
-| Archivo | Responsabilidad |
+El instalador crea un entorno Python propio, instala las dependencias y compila la interfaz. El panel y FastAPI comparten [http://127.0.0.1:8003/sdn-selector.html](http://127.0.0.1:8003/sdn-selector.html). No es necesario arrancar Vite por separado ni usar una tercera VM de interfaz.
+
+Para detener solo esta aplicación:
+
+```powershell
+.\Detener_interfaz.cmd
+```
+
+Los archivos `.cmd` se ejecutan: no hay que copiar su contenido dentro de PowerShell. Las VMs y sus servicios se mantienen por separado. La guía ampliada está en [LEEME_WINDOWS.md](LEEME_WINDOWS.md).
+
+## Conexiones del laboratorio
+
+Edita `configuracion_windows.json` si las direcciones de tus VMs son diferentes y reinicia la aplicación Windows.
+
+| Servicio | Configuración del laboratorio |
 |---|---|
-| `backend/servicios/fuentes_sdn.py` | Fuentes configuradas, filtro de sesión y Auto estable |
-| `backend/servicios/comparacion_rutas.py` | Costos direccionales y evaluación común de caminos |
-| `backend/api/sdn_comparacion.py` | Snapshot fijado, inferencia validada y endpoint de comparación |
-| `backend/api/sdn_selector_v2.py` | Integración de fuentes y router nuevo |
-| `frontend/app/src/sdn-selector-v2/ComparacionRutas.jsx` | Formulario, tarjetas, tabla y predicciones fijadas |
-| `SelectorRoot.jsx`, `PanelSdn.jsx` en la misma carpeta | Selector automático, invalidación y trazados sobre el mapa existente |
-| `tests/test_comparacion_rutas.py` | Casos sintéticos de algoritmo, datos inválidos y fuentes |
-| `tests/validar_en_vivo.py` | Validación explícita contra las dos redes existentes |
+| Observador NSFNET / Mininet | http://192.168.56.107:8769 |
+| Observador GEANT2 / Mininet | http://192.168.56.107:8768 |
+| RYU REST NSFNET | http://192.168.56.108:18081 |
+| RYU REST GEANT2 | http://192.168.56.108:18080 |
+| Inferencia del modelo común / RYU | http://192.168.56.108:8010 |
 
-## Arranque, arquitectura y reversión
+Puertos OpenFlow: NSFNET 16654; GEANT2 16653. Encender las VMs no garantiza que sus controladores, observadores y servicio de inferencia estén en ejecución. La interfaz necesita acceso HTTP a esos servicios.
 
-Consultar [guía de arranque](documentacion/ARRANQUE_Y_RECUPERACION.md), [costo y arquitectura](documentacion/ARQUITECTURA_Y_COSTO.md), [respaldo y reversión](documentacion/RESPALDO_Y_ROLLBACK.md) y [evidencias](evidencias/RESULTADOS.md).
+## Dataset y modelo
 
-Las dependencias de Python y npm del proyecto se conservan; no se reinstalaron ni actualizaron bibliotecas en las VMs. Para comprobar sobre su entorno existente:
+Se completó un dataset consolidado de **20 horas totales entre ambas topologías**, con procedencia diferenciada y campo `topologia`. El modelo común utiliza 60 entradas y seis salidas direccionales: throughput RX, delay y pérdida en ambos sentidos. El entrenamiento y la evaluación final ya se realizaron en RYU.
 
-```bash
-cd ~/proyecto_nsfnet
-.venv/bin/python -m pytest tests -q
-SDN_TEST_API=http://127.0.0.1:8003 .venv/bin/python tests/validar_en_vivo.py
+Los archivos originales permanecen en RYU y **no están incluidos en este repositorio**:
+
+- Dataset: `/home/ryu/proyecto_nsfnet/datos/nocturna_c064e9fb0ad2_win4e5zw/dataset_consolidado_20h.csv`.
+- Modelo: `/home/ryu/proyecto_nsfnet/resultados_comun_20261107T205101/modelo_20261107T205202Z_n4vncu_0/modelo_comun.pkl`.
+- Evaluación guardada: `evaluacion_test.json` junto al modelo.
+
+Clonar este código no reconstruye por sí solo esos artefactos ni el contenido completo de las VMs. El panel consume el servicio de inferencia existente; no reentrena ni necesita copiar el modelo a Windows. La pérdida de las sesiones instrumentadas incluye rechazos locales de sondas y el throughput RX no equivale a ancho de banda disponible.
+
+## Organización
+
+- `frontend/app/`: React, Cytoscape, mapas y comparación.
+- `backend/`: FastAPI, cálculo de rutas, verificación de fuentes e integración ML.
+- Lanzadores y `requirements-windows.txt`: ejecución nativa en Windows.
+- `laboratorio/`: copias de recuperación de scripts y perfiles RYU/Mininet procedentes de la entrega anterior. No constituyen una copia recién extraída de las VMs actuales.
+- `tests/`: pruebas sintéticas y comprobaciones explícitas del laboratorio.
+- `documentacion/` y `evidencias/`: arquitectura, cambios e historial. Las guías de puertos 5181/5182 y de la tercera VM describen versiones anteriores; para esta versión utiliza esta guía y LEEME_WINDOWS.
+
+Los entornos, dependencias instaladas, registros de ejecución, respaldos, CSV, modelos y credenciales se excluyen mediante `.gitignore`.
+
+## Comprobaciones
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-ci.txt
+.\.venv\Scripts\python.exe -m pytest tests -q
+node --test tests/test_geografia_cuatro.mjs tests/test_contrato_cuatro_frontend.mjs
 ```
 
-La segunda orden realiza consultas e inferencias reales y cambia la selección del backend probado. Usar el puerto de validación mientras se revisa el proyecto.
+Estas pruebas sintéticas no necesitan las VMs. La compilación se realiza con `python instalar_windows.py`. El script `tests/validar_en_vivo.py` es una comprobación separada que consulta redes reales y puede cambiar la selección del backend probado; no forma parte del arranque habitual.
 
-## GitHub
+## Procedencia
 
-Para colaborar, consultar [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md) y el [registro de cambios](CHANGELOG.md). GitHub Actions ejecuta las pruebas Python en un entorno aislado, sin conectarse a las VMs; las pruebas reales y la compilación del frontend verificadas en el laboratorio se documentan en `evidencias/`. La documentación histórica `SDN_VIVO_V1_LEEME.md` describe una integración anterior; las guías enlazadas en este README corresponden a esta versión.
+Basado en [Sergio777gg/sdn-kdn-rutas-ml](https://github.com/Sergio777gg/sdn-kdn-rutas-ml), commit `aeab8d50f7de505672b3940c9905ed9ee5929194`, con adaptación Windows, cuatro criterios, métricas comunes y mapas añadidos en esta entrega.
 
-```bash
-git clone https://github.com/Sergio777gg/sdn-kdn-rutas-ml.git
-cd sdn-kdn-rutas-ml
-```
-
-El repositorio preparado excluye contraseñas, llaves, `.env`, modelos, datasets, logs operativos, respaldos y dependencias instaladas. Las evidencias de rutas incluidas son resultados fechados y no una fuente de predicciones actuales. No se añade licencia porque corresponde decidirla al propietario del proyecto.
-
-Los modelos y los CSV originales permanecen en las VMs; no forman parte de este paquete. Los hashes de conservación se incluyen para verificar que no cambiaron. Los scripts bajo `laboratorio/` son copias de recuperación de las fuentes realmente inspeccionadas, con un envoltorio nuevo de arranque explícito. No se ejecutaron sobre las redes activas.
-
-## Límites pendientes
-
-Revisión visual manual pendiente. La activación en los puertos habituales está completada y verificada por HTTP. El arranque de recuperación Mininet tras un apagado real se preparó y comprobó estáticamente, pero no se ensayó: hacerlo habría interrumpido o duplicado las redes activas. Multiusuario, autenticación, aplicación de rutas ML y evaluación experimental de mejoras quedan fuera de esta ampliación.
+Cartografía incluida localmente: [Natural Earth, dominio público](https://www.naturalearthdata.com/about/terms-of-use/). Referencia de grafos numerados: [BNN-UPC](https://github.com/BNN-UPC/DRL-ES-OTN/tree/main/dataset_Topologies). Se conserva la documentación de procedencia; no se añade una licencia general al código sin decisión de sus autores.

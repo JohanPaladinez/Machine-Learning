@@ -1,3 +1,4 @@
+import { withPlaces } from '../geografia/geography.js';
 // Configuración de red y cálculos locales. No son mediciones ni predicciones ML.
 export const DEMO = {
   id: "demo", name: "Demostración", source: "Ejemplo original de seis nodos",
@@ -85,12 +86,12 @@ export function parseTopologyDocument(document) {
     for (const node of nodes) {
       if (node.hostPort !== null && usedPorts.has(`${node.id}:${node.hostPort}`)) throw new Error(`${id}: el puerto del host colisiona en ${node.id}.`);
     }
-    result[id] = { id, name: id === "nsfnet" ? "NSFNET" : "GEANT2", illustrative: false,
+    result[id] = withPlaces({ id, name: id === "nsfnet" ? "NSFNET" : "GEANT2", illustrative: false,
       source: text(profile.source_topology_id) || "Mapa importado",
       runId: text(profile.source_run_id), configurationSource: text(profile.configuration_source),
       hostAttachmentSource: text(profile.host_attachment_source),
       createdUtc: text(document.created_utc),
-      nodes: nodes.sort((a, b) => compareIds(a.id, b.id)), links };
+      nodes: nodes.sort((a, b) => compareIds(a.id, b.id)), links });
   }
   if (!Object.keys(result).length) throw new Error("El archivo no contiene nsfnet ni geant2.");
   return result;

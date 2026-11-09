@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "nombre": "SDN/KDN Windows - comparacion de rutas ML",
+  "version": "1.1.1",
+  "api_port": 8003,
+  "web_port": 8003,
+  "source_repository": "https://github.com/Sergio777gg/sdn-kdn-rutas-ml",
+  "source_commit": "aeab8d50f7de505672b3940c9905ed9ee5929194"
+}
