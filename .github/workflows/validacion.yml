@@ -1,0 +1,31 @@
+name: Validacion
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas-python:
+    name: Pruebas Python
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-ci.txt
+      - name: Preparar entorno aislado
+        run: python -m pip install -r requirements-ci.txt
+      - name: Ejecutar pruebas sin contactar las VMs
+        run: python -m pytest tests -q
+      - name: Comprobar sintaxis de servicios y recuperacion
+        run: python -m compileall -q backend scripts laboratorio

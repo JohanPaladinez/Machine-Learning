@@ -1,0 +1,227 @@
+{
+  "backup": "/home/vboxuser/proyecto_nsfnet/backups/work_rutas_ml_20261109_170550",
+  "files": [
+    {
+      "path": ".env.example",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "403029a85d03499b1ae87e42447b4cf58805d3818f144901dfa535d118fae1db"
+    },
+    {
+      "path": ".gitignore",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "f41c1dd4fb29f964f82d4eaf0323966617a0130f0de839d002bf7ffab2bf4cd2"
+    },
+    {
+      "path": "README.md",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "0a20f3cec321c07c4fbe9fe300a7daee1141c89a81b4e5078cc720b109e2e307"
+    },
+    {
+      "path": "backend/api/sdn_comparacion.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "c9af1abc804804ee9a6b4455dcbe7b5823863c577e66443f534af49c863c9ae2"
+    },
+    {
+      "path": "backend/api/sdn_selector_v2.py",
+      "operation": "modified",
+      "before_sha256": "58636e7c5a4a21be5e56f56286b8dc6b499c0e8310ef516c7114ffc021ad792e",
+      "after_sha256": "ee386f08282a22e535468c29c4c65911a3e05858f270da1b50287d3cb0a8f995"
+    },
+    {
+      "path": "backend/servicios/comparacion_rutas.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "a7431ecfec578b9793595ce2606313b1942d56cbd650ef83eb14cbcf7b97a904"
+    },
+    {
+      "path": "backend/servicios/fuentes_sdn.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "96e37fc437a6c204f0f7b69f45802813af481ed85ff8a076614e416fd1633884"
+    },
+    {
+      "path": "documentacion/ARQUITECTURA_Y_COSTO.md",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "863d9e50e29879057d12c779013875c727ad3a0fde39fd33b434d854c4d1e9bf"
+    },
+    {
+      "path": "documentacion/ARRANQUE_Y_RECUPERACION.md",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "85238731a7551ad09b17d58f2b1a344b6cd9e3598fd3edd9cc54d8b449708715"
+    },
+    {
+      "path": "documentacion/RESPALDO_Y_ROLLBACK.md",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "62392f3382fa77e20dddfe995d047a9f3a0dc2ba2f0a80764a9ea98d729b74f2"
+    },
+    {
+      "path": "evidencias/RESULTADOS.md",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "d914fe295b855ecf4f31cecdc14b80fd525b91096009189438df9093a9e23e5b"
+    },
+    {
+      "path": "evidencias/activacion_verificada.json",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "abfa8f174573961d26f8967534fa079139ae129480bd7cabca299f2a5aacd078"
+    },
+    {
+      "path": "evidencias/conservacion-antes.sha256",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "ead8adb5cdd1690fb33f6eca32d0b2da07bf6869f1a0b014ffa39ef90aa952ef"
+    },
+    {
+      "path": "evidencias/conservacion-despues.sha256",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "ead8adb5cdd1690fb33f6eca32d0b2da07bf6869f1a0b014ffa39ef90aa952ef"
+    },
+    {
+      "path": "evidencias/resultados_reales.json",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "6a2eb3c082bad73f4c57c94cab76a093fd3daea7876e248668ea95a258d5aae4"
+    },
+    {
+      "path": "frontend/app/src/sdn-selector-v2/ComparacionRutas.jsx",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "b57865db4054fd0df437208c30fdc3db264ff3c516b5ccb3fc54b00b7eb58ab1"
+    },
+    {
+      "path": "frontend/app/src/sdn-selector-v2/PanelSdn.jsx",
+      "operation": "modified",
+      "before_sha256": "1e13c59f39d75c02e37d552febbcbb3880ec151eedf7cdddc1834d3d45dd3f95",
+      "after_sha256": "0fcd56cced7af8bebcdd53e4dcffe6dc55c1bcc91e794ebfed03de1018383d3a"
+    },
+    {
+      "path": "frontend/app/src/sdn-selector-v2/SelectorRoot.jsx",
+      "operation": "modified",
+      "before_sha256": "25f4d4a53b7e30bd7a05d3ed57bdb6804951b885061e1b47908da1522968c785",
+      "after_sha256": "af7af6bc230f718b1be69eb54786bc2a2d207b5fbe0688a42640042be2b500dd"
+    },
+    {
+      "path": "laboratorio/mininet/geant2/perfil.json",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "a83fe21a9e2f4f2c3cd56dd4360cfd99ba658213ebcc508272b5f54d0222a7a4"
+    },
+    {
+      "path": "laboratorio/mininet/geant2/sdn_noche_capturar.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "7adbc8f4ab53e3a8c546a33cd95d31f3711fed815fffb68f674f4a9c98e489ea"
+    },
+    {
+      "path": "laboratorio/mininet/geant2/sdn_noche_comun.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "a09efae0b76747a56da5b6278ecad59edbff77d1563d3aba956b95aa9045cc81"
+    },
+    {
+      "path": "laboratorio/mininet/geant2/sdn_noche_trafico.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "3df44a2284bbfa6437728487315d17e5e3b79ae370fb71bb4ef9fdec2b977186"
+    },
+    {
+      "path": "laboratorio/mininet/geant2/telemetria_geant_v1.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "dbcaa74f97a504a5cb3543ef25965d5b28ea13a08a7bdeb67c287680921cd5f5"
+    },
+    {
+      "path": "laboratorio/mininet/iniciar.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "7fbcfb4f03f7262dc59a72095a337cba175906fb233a8f36dc137145a75005f6"
+    },
+    {
+      "path": "laboratorio/mininet/nsfnet/perfil.json",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "379a2a6a9ba90b1045754ae88ded576e7a29114563979f6f9a2628ada0189b60"
+    },
+    {
+      "path": "laboratorio/mininet/nsfnet/sdn_noche_capturar.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "372217803680d449ff994eca465b85c584497d70da79408d0a39347c50e3c4c1"
+    },
+    {
+      "path": "laboratorio/mininet/nsfnet/sdn_noche_comun.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "a09efae0b76747a56da5b6278ecad59edbff77d1563d3aba956b95aa9045cc81"
+    },
+    {
+      "path": "laboratorio/mininet/nsfnet/sdn_noche_trafico.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "3df44a2284bbfa6437728487315d17e5e3b79ae370fb71bb4ef9fdec2b977186"
+    },
+    {
+      "path": "laboratorio/mininet/nsfnet/telemetria_nsf_v1.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "00f79f6be8bd4e8870f82ea8189fe451328ec63a54403834f19be724a9516eb0"
+    },
+    {
+      "path": "laboratorio/mininet/observador_sdn.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "a031e111d17437b5ac208ebde545fbcf5c4c68940ac5b801f482dd09f6c32cd6"
+    },
+    {
+      "path": "laboratorio/ryu/servidor.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "3db9c0b5baa7cb7b632b328d16fec67a515d3edeface4da40377b88db6e5f064"
+    },
+    {
+      "path": "scripts/activar_interfaz.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "42c7c7ccb218ecf5e2f0bdcd536631c4fcadb46744f58176d64b8fad51d1bd3b"
+    },
+    {
+      "path": "scripts/compilar_interfaz.sh",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "f31cd04f61cfc67ae43fdc0d7104b2b986eea47019a5ba20a6b162d1e3908f34"
+    },
+    {
+      "path": "scripts/iniciar_backend.sh",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "88b9532e426fc40bcca89ec47887c8f1899ccc38a82fa1b9f305fadb6a33d3ee"
+    },
+    {
+      "path": "scripts/iniciar_frontend.sh",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "dc6bbaf41c7273a07a1e6677b0c784311974554b36cef5bd4f7a3932c333c324"
+    },
+    {
+      "path": "tests/test_comparacion_rutas.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "e4bb148348d85cf38c3ac87ca56b89ff25d08d45b0e8e6990472bf69b786eae6"
+    },
+    {
+      "path": "tests/validar_en_vivo.py",
+      "operation": "added",
+      "before_sha256": null,
+      "after_sha256": "21a191f3acb58a4f1d3af0372220576043322e82904adb937df35d108e43f5b5"
+    }
+  ]
+}

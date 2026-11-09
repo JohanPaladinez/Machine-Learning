@@ -1,0 +1,13 @@
+{
+  "activated": true,
+  "url": "http://127.0.0.1:5181/sdn-selector.html",
+  "backend_port": 8002,
+  "bundle_api_verified": true,
+  "intelligent_single_card_available": true,
+  "cors_verified": true,
+  "arbitrary_source_rejected": true,
+  "existing_link_predictions_verified": true,
+  "topology": "nsfnet",
+  "session_id": "en_vivo_nsf_reinicio_trjris6r",
+  "graph_version": "2094af395710cbadf2223ad6"
+}

@@ -1,0 +1,7 @@
+{
+  "path": "/home/vboxuser/proyecto_nsfnet/backups/work_ruta_ml_panel_20261109_173738",
+  "file": "frontend/app/src/sdn-selector-v2/PanelSdn.jsx",
+  "before_sha256": "2c7ffd56a3aaf86a3ec8c2b39461f08b57ca8325e89484e65d34fc083b4c5da1",
+  "after_sha256": "0fcd56cced7af8bebcdd53e4dcffe6dc55c1bcc91e794ebfed03de1018383d3a",
+  "change": "Opcion Ruta inteligente (ML) en el formulario y tarjeta de resultado existentes; fuente ML validada, caducidad y predicciones por enlace."
+}

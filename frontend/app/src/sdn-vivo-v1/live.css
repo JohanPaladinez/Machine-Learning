@@ -1,0 +1,19 @@
+.sdn-live-setup { margin-bottom: 20px; }
+.sdn-live-source-form { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; }
+.sdn-live-source-form > div { flex: 1 1 320px; }
+.sdn-live-source-form > button { min-height: 42px; }
+.sdn-live-source-form .sdn-muted { margin-top: 8px; }
+.sdn-live-banner { display: flex; align-items: start; gap: 12px; padding: 16px; border: 1px solid; border-radius: 8px; margin-top: 18px; }
+.sdn-live-banner > svg { flex-shrink: 0; margin-top: 2px; }
+.sdn-live-banner strong { font-size: 13px; }
+.sdn-live-banner p { font-size: 12px; line-height: 1.7; margin: 7px 0; overflow-wrap: anywhere; }
+.sdn-live-banner small { font-size: 10px; line-height: 1.7; }
+.sdn-live-ok { color: #88e2be; background: #112e28; border-color: #285b46; }
+.sdn-live-wait { color: #e7c38b; background: #30291c; border-color: #51432a; }
+.sdn-live-options { color: #91afce; font-size: 11px; margin-top: 15px; }
+.sdn-live-options summary { cursor: pointer; }
+.sdn-live-options .field-label { margin-top: 15px; }
+.sdn-live-options input { max-width: 500px; }
+.sdn-net-unverified .topology-canvas { opacity: 0.48; }
+.sdn-live-metrics .sdn-table { margin-top: 13px; }
+.sdn-live-metrics .sdn-table th, .sdn-live-metrics .sdn-table td { padding-left: 6px; padding-right: 6px; }
