@@ -1,45 +1,68 @@
-# Usar SDN/KDN en Windows — version actual
+# SDN/KDN 1.3 — interfaz en Windows
 
-El panel React y FastAPI se ejecutan en Windows, puerto 8003. Mininet y RYU siguen en sus VMs. Esta guia sustituye las instrucciones de la antigua tercera VM y de las cuatro tarjetas por criterio.
+Windows ejecuta React/Cytoscape y FastAPI en el puerto 8003. Solo se necesitan las VMs Mininet y RYU; la antigua VM Ubuntu de interfaz puede permanecer apagada. Ambas topologias pueden funcionar simultaneamente.
 
 ## Instalar y abrir
 
-En un clon nuevo, ejecutar `python instalar_windows.py` desde la raiz. Despues hacer doble clic en `Abrir_interfaz.cmd`. Abrir http://127.0.0.1:8003/sdn-selector.html. Node solo se utiliza para compilar; no hace falta iniciar Vite por separado.
+Con Python 3.10 o posterior y Node compatible con Vite 8, ejecutar en PowerShell desde la raiz del clon:
 
-Para cargar cambios de backend, ejecutar `Detener_interfaz.cmd` y luego `Abrir_interfaz.cmd`. Recargar Ctrl+F5. Los archivos cmd se ejecutan; su contenido no se pega en PowerShell. El gestor comprueba el contrato del servidor y la identidad de los procesos propios. No detiene servicios ajenos para liberar puertos.
+```powershell
+python instalar_windows.py
+.\Abrir_interfaz.cmd
+```
 
-## Redes y consolas
+El instalador prepara el entorno y compila el panel. No copia ni entrena modelos: las fuentes instrumentadas, datos y modelos deben existir en las VMs. Clonar no reconstruye las VMs.
 
-Mantener RYU, sus controladores y los servicios de modelos disponibles. Ejecutar `Instalar_consolas_Mininet.cmd` para abrir las dos consolas SSH y autenticar Mininet/sudo. El lanzador requiere las fuentes instrumentadas existentes en la VM y conserva sus archivos anteriores. La correccion 1.1 de la reserva TCP ya fue confirmada por el usuario.
+Los CMD se ejecutan con doble clic o como archivos; no se pega su contenido en PowerShell. `Abrir_interfaz.cmd` abre http://127.0.0.1:8003/sdn-selector.html; `Detener_interfaz.cmd` cierra solo esta aplicacion. Tras actualizar codigo, recompilar con `python instalar_windows.py`, usar `Reiniciar_interfaz.cmd` y Ctrl+F5. El contrato de salud identifica version 1.3.0 y las funciones de cinco rutas y enrutamiento ICMP; no se reutiliza un backend anterior como si incluyera los cambios.
 
-Se esperan `mininet-geant2>` y `mininet-nsfnet>`. En cada una se admiten `nodes`, `links`, `net`, `ports`, `pingall` y `telemetria`. La medicion continua en un hilo sobre esa misma red; `exit` o cerrar SSH termina solo esa topologia. Mantener ambas ventanas abiertas. No usar limpieza global para resolver un fallo de una sola sesion.
+## Arranque diario
 
-En el panel seleccionar NSFNET o GEANT2 y esperar identidad de red verificada y telemetria reciente. Despues de recrear una red, seleccionar su sesion nueva. El estado de FastAPI, de RYU y del modelo se comprueba por separado.
+1. Encender RYU y Mininet y esperar que arranquen.
+2. Ejecutar `Arrancar_RYU.cmd` y esperar **RYU LISTO**.
+3. Ejecutar `Abrir_consolas_Mininet.cmd`, introducir SSH/sudo y esperar `mininet-geant2>` y `mininet-nsfnet>`. Mantener ambas ventanas abiertas.
+4. Ejecutar `Abrir_interfaz.cmd`, seleccionar topologia y esperar red verificada y una ventana completa de medicion.
 
-## Comparar las cinco rutas
+Los lanzadores diarios reutilizan fuentes/modelos existentes, sin entrenar ni cambiar relojes. El nuevo arranque RYU se reviso localmente; su primera comprobacion completa tras apagar las VMs queda pendiente. Ver [comandos y apagado](documentacion/GUIA_APAGADO_Y_ARRANQUE_SDN.md).
 
-1. Elegir origen y destino distintos en Enrutamiento.
-2. Pulsar **Comparar las 5 rutas**.
-3. Revisar convencional (1/capacidad), polinomial, Decision Tree, Random Forest y XGBoost. Cada modelo produce pesos para Dijkstra; no se instala una ruta al pulsar este boton.
-4. Las cinco alternativas se evalúan con los mismos siete indicadores y la misma ventana medida de enlaces. Las previsiones propias de cada modelo aparecen aparte. Las rutas pueden coincidir sin que exista un error.
-5. Las casillas y **Ver solo este trazado** controlan el mapa. El dorado identifica tramos compartidos. **Mostrar todos** restaura los trazados visibles.
+## Comparar cinco rutas
 
-La comparacion completa se conserva en el navegador con su fecha, ventana e identidad para la sustentacion. **Actualizar comparacion** pide inferencias nuevas; **Recuperar ultima comparacion guardada** recupera la ultima completa; **Limpiar comparacion** elimina esa copia local. Una respuesta parcial no sustituye la ultima completa. Las peticiones nuevas mantienen el limite de 120 segundos y las comprobaciones de sesion/entradas; un resultado archivado no se anuncia como actual ni se dibuja sobre otra sesion.
+En Enrutamiento, elegir origen y destino y pulsar **Comparar las 5 rutas**: Dijkstra convencional por suma de 1/capacidad y cuatro rutas con pesos derivados de Polinomial, Decision Tree, Random Forest y XGBoost. Los caminos pueden coincidir; no se fuerzan diferencias.
 
-## Evaluacion de modelos e inspector
+Tarjetas y tabla presentan los mismos siete indicadores sobre la misma informacion de red: saltos, retardo configurado, costo inverso de capacidad, QoS observado, delay medido agregado, perdida medida compuesta y capacidad minima nominal. Las previsiones de cada modelo se muestran aparte. Las agregaciones por enlace son aproximaciones, no medidas extremo a extremo. Las casillas y Ver solo este trazado/Mostrar todos controlan el mapa; el dorado identifica enlaces compartidos. Comparar calcula y dibuja, sin instalar reglas.
 
-La evaluacion de los cuatro modelos esta en un desplegable dentro de Enrutamiento. **Cargar informe de RYU** importa los JSON de validacion y test descriptivo, sin cargar PKL en Windows. Muestra MSE, RMSE, MAE, R², muestras, tiempos y predicciones fuera de rango, por variable/topologia/procedencia. Importar informes no cambia el modelo conectado y no verifica por si solo que ambos archivos provengan de la misma ejecucion.
+## Aplicar y demostrar la ruta
 
-El servicio 8011 atiende las cinco rutas. El inspector de predicciones de enlaces y la ruta ML individual conservan 8010. XGBoost se selecciono con validacion; el test posterior es descriptivo porque ya se habia examinado. Los errores se calculan con predicciones crudas; los ajustes fisicos de las nuevas inferencias se muestran aparte.
+**Preparar** recalcula la alternativa elegida y valida camino, sesion, grafo, modelo y puertos. **Aplicar ruta ICMP** instala reglas mediante RYU y confirma su lectura. Se afecta ICMP IPv4 entre los hosts elegidos; el regreso usa el mismo recorrido invertido. ARP, UDP del recolector y sondas mantienen su forwarding.
 
-Seleccionar un switch muestra su configuracion e informacion operativa de OFCTL REST: fabricante, plataforma, versiones, puertos y contadores. Seleccionar un enlace muestra ambos puertos y la ventana de sondas. Los campos ausentes aparecen como no disponibles. Drops, errores, rechazos locales y sondas no recibidas son magnitudes diferentes.
+**Iniciar evidencia** toma contadores; ejecutar el ping mostrado en la consola Mininet y pulsar **Verificar trafico**. Se exigen incrementos en todos los saltos y ambos sentidos, y se permite descargar evidencia JSON. **Retirar reglas aplicadas** elimina estrictamente solo las reglas propias. El usuario aporto capturas y confirmo funcionamiento con convencional/XGBoost, retiro y ambas topologias. Esta evidencia demuestra recorrido ICMP, no una mejora de rendimiento. Ver [guia de demostracion](documentacion/GUIA_ENRUTAMIENTO_REAL_ICMP.md).
 
-El mapa muestra hosts, acceso y controlador, con casillas para ocultarlos si dificultan ver las rutas. Las conexiones de control son logicas; las posiciones del controlador/hosts son esquematicas. Las ciudades no certifican una correspondencia historica de los IDs.
+Las reglas aplicadas no expiran automaticamente; permanecen hasta retirarlas o detener la red. El plan sin aplicar dura 90 segundos y las nuevas solicitudes ML siguen exigiendo entradas recientes/completas. Aplicar fija la seleccion, sin reoptimizarla automaticamente.
 
-## Diagnostico y alcance
+## Comparaciones guardadas y evaluacion ML
 
-Editar `configuracion_windows.json` si cambian las IP y reiniciar el servidor. Los registros estan en `.ejecucion_windows/sesion_.../api.log`. Encender una VM no confirma que los servicios esten iniciados. Si faltan datos recientes, comprobar servicio, identidad y tiempos; no rellenar entradas ML con ceros.
+Las comparaciones se conservan con ventana, pesos e identidad para la sustentacion. Actualizar comparacion calcula de nuevo; Recuperar ultima comparacion guardada restaura la copia de este navegador. Una respuesta parcial no reemplaza el ultimo resultado completo. Un resultado de otra sesion puede verse como historial, pero no se dibuja ni aplica como si perteneciera a la red actual. Se mantienen las validaciones al pedir nuevas predicciones.
 
-`Alinear_relojes_VMs.cmd` es una herramienta manual opcional que cambia la hora de las VMs usando Windows como referencia. No se ejecuta automaticamente y no configura NTP. Solo usarla cuando se haya decidido ese ajuste; las ventanas que cruzan un salto temporal se descartan.
+El detalle de evaluacion importa comparacion_validation.json y comparacion_test.json de RYU, sin cargar PKL en Windows. Presenta MSE, RMSE, MAE, R2, muestras, predicciones fuera de rango y tiempos por variable, sentido, topologia y procedencia. XGBoost se selecciono por validacion global normalizada de seis salidas y ambas topologias; puede no ganar cada metrica. La polinomial es baseline grado 2 con Ridge. El test posterior es descriptivo porque ya se habia examinado. Las metricas conservan predicciones crudas y la inferencia declara su proyeccion a rangos fisicos. Importar informes no cambia el modelo conectado ni instala rutas.
 
-Aplicar y demostrar el recorrido real elegido desde la GUI sigue pendiente. Las medidas de enlace y el costo QoS no acreditan una mejora extremo a extremo. El dataset, los modelos y los resultados originales permanecen en RYU y no se reentrenan para abrir esta version. Consultar README.md y documentacion/ESTADO_ACTUAL.md.
+## Mapas e inspectores
+
+Mapa geografico y Esquema muestran switches, hosts y controlador; los enlaces de control no participan en Dijkstra. Las ciudades son referencias reales del laboratorio, sin correspondencia historica verificada con los IDs; no cambian enlaces ni pesos. La cartografia local de Natural Earth no requiere claves externas.
+
+Los inspectores muestran fabricante/version/plataforma reportados, puertos y estado, bits/paquetes TX/RX, errores, descartes, tasas y medidas dirigidas. La perdida ofrecida incluye rechazos locales de sondas y se distingue de descartes y perdida en transito. Los datos ausentes no se sustituyen por cero.
+
+## Servicios
+
+Editar configuracion_windows.json si cambian las direcciones y reiniciar el panel; no requiere recompilar ese cambio.
+
+| Servicio | Direccion |
+|---|---|
+| Observador NSFNET | http://192.168.56.107:8769 |
+| Observador GEANT2 | http://192.168.56.107:8768 |
+| REST RYU NSFNET / OpenFlow | http://192.168.56.108:18081 / 16654 |
+| REST RYU GEANT2 / OpenFlow | http://192.168.56.108:18080 / 16653 |
+| Modelo individual del inspector | http://192.168.56.108:8010 |
+| Cuatro modelos | http://192.168.56.108:8011 |
+
+Windows consulta estas API directamente; SSH opera las VMs. Los servicios son de laboratorio, sin autenticacion multiusuario para Internet. La seleccion es compartida por navegadores de la misma instancia. Los registros y journal de reglas estan en .ejecucion_windows/ y el entorno en .venv/; no se publican. Dataset/modelos siguen en RYU. El arranque no cambia la hora ni configura NTP. Un rechazo por ventana antigua exige comprobar tiempos/recolector, no desactivar validaciones.
+
+Basado en [Sergio777gg/sdn-kdn-rutas-ml](https://github.com/Sergio777gg/sdn-kdn-rutas-ml), commit aeab8d50f7de505672b3940c9905ed9ee5929194, ampliado para este laboratorio. Ver [README](README.md) y [estado actual](documentacion/ESTADO_ACTUAL.md).

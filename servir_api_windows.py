@@ -22,7 +22,8 @@ def crear_app(raiz):
 
     @aplicacion.get("/api/windows/salud")
     def salud_windows():
-        return {"estado": "ok", "servicio": "SDN/KDN Windows Rutas ML", "version": "1.2.0",
+        return {"estado": "ok", "servicio": "SDN/KDN Windows Rutas ML", "version": "1.3.0",
+                "enrutamiento_icmp_version": 1,
                 "comparacion_modelos_version": 1,
                 "criterios_comparacion": list(CRITERIA)}
 

@@ -18,6 +18,7 @@ class ContractTests(unittest.TestCase):
         if criteria is not None:
             result['criterios_comparacion'] = criteria
             result['comparacion_modelos_version'] = 1
+            result['enrutamiento_icmp_version'] = 1
         return result
 
     def check_health(self, value):
@@ -36,6 +37,11 @@ class ContractTests(unittest.TestCase):
 
     def test_four_criteria_backend_is_reused(self):
         self.assertTrue(self.check_health(self.health(['hops', 'delay', 'capacity', 'ml'])))
+
+    def test_backend_without_real_forwarding_is_not_reused(self):
+        health = self.health(['hops', 'delay', 'capacity', 'ml'])
+        del health['enrutamiento_icmp_version']
+        self.assertFalse(self.check_health(health))
 
     def test_other_service_is_not_accepted(self):
         health = self.health(['hops', 'delay', 'capacity', 'ml'])

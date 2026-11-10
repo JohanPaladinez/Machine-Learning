@@ -28,7 +28,7 @@ jobs:
       - name: Ejecutar pruebas sin contactar las VMs
         run: python -m pytest tests -q --ignore=tests/ml
       - name: Comprobar sintaxis de servicios y recuperacion
-        run: python -m compileall -q backend scripts laboratorio consolas_mininet_v1 comparacion_ml_sdn rutas_cinco_modelos_ryu
+        run: python -m compileall -q backend scripts laboratorio consolas_mininet_v1 comparacion_ml_sdn rutas_cinco_modelos_ryu arranque_diario_sdn
 
   pruebas-javascript:
     name: Pruebas de presentacion

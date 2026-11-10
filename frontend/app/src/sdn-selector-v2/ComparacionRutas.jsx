@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import AplicarRuta from './AplicarRuta.jsx';
 import { ROUTES, routeGroups, routesOf, comparisonContractError, completeComparison, savePresentation, restorePresentation, COMPARISON_STORAGE } from './fiveModelView.js';
 
 const defaults = { delay: 0.5, loss: 0.35, capacity: 0.15, load: 0 };
@@ -88,6 +89,7 @@ export default function ComparacionRutas({ live, apiUrl, origin, destination, re
     {error && <p className="error-message" role="alert">{error}</p>}
     {result && <>
       <div className="sdn-comparison-summary"><strong>{groups.length} {groups.length === 1 ? 'camino distinto' : 'caminos distintos'}</strong><span>entre {available.length} alternativas disponibles</span></div>
+      <AplicarRuta key={JSON.stringify([result.comparison_id, live.instanceId, live.graphVersion, origin, destination])} comparison={result} live={live} apiUrl={apiUrl} origin={origin} destination={destination} onFocus={key => onVisibility(Object.fromEntries(ROUTES.map(r => [r.key, r.key === key])))} />
       <div className="sdn-comparison-cards">{ROUTES.map(({ key, label, color }) => <article key={key} style={{ '--route-color': color }} className={!routes[key] ? 'is-unavailable' : ''}>
         <div className="sdn-route-card-heading"><span className="sdn-route-dot" /><h4>{label}</h4><label title={`Mostrar ${label} en el mapa`}><input type="checkbox" aria-label={`Mostrar ${label}`} checked={Boolean(visibility[key])} disabled={!routes[key]} onChange={e => onVisibility(v => ({ ...v, [key]: e.target.checked }))} /></label></div>
         {routes[key] ? <><p className="sdn-route-path">{pathName(routes[key].ruta)}</p>

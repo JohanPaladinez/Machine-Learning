@@ -2,7 +2,7 @@
 
 ## Alcance
 
-La aplicación está destinada a una red de laboratorio. FastAPI y Vite escuchan en loopback en la VM de interfaz. La selección de topología es global al proceso; no se ha implementado aislamiento entre usuarios ni autenticación para un despliegue público de la aplicación.
+La aplicación está destinada a una red de laboratorio. FastAPI sirve la API y el panel compilado en loopback de Windows, puerto 8003. La selección de topología es global al proceso; no se ha implementado aislamiento entre usuarios ni autenticación para un despliegue público de la aplicación.
 
 El repositorio público contiene código y documentación. Publicar el repositorio no publica los servicios de las VMs.
 
@@ -19,3 +19,9 @@ Si el problema requiere información confidencial, contactar al propietario medi
 - Guardar credenciales fuera del repositorio; `.env.example` contiene únicamente valores de configuración del laboratorio.
 - No publicar modelos, datasets, logs de ejecución ni copias de respaldo.
 - Aplicar cambios al plano de datos solo con autorización y un procedimiento de reversión.
+
+## Escrituras OpenFlow de la funcion de enrutamiento
+
+El comparador calcula sin instalar. La accion explicita Aplicar instala reglas ICMP entre IP de hosts concretos en el controlador de la fuente configurada. El navegador no puede elegir una URL arbitraria de controlador. Se verifican identidad de red, puertos, reglas y contadores; el retiro se limita a cookies/matches propios mediante delete_strict. Se preservan las reglas de arranque, ARP, UDP y sondas.
+
+El journal `.ejecucion_windows/enrutamiento_icmp.json` puede contener identificadores de operaciones y se excluye de Git. No exponer OFCTL REST ni esta API sin autenticacion en Internet. Los servicios del laboratorio deben permanecer en su red privada.

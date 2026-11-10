@@ -1,0 +1,9 @@
+.sdn-apply-route { margin: 24px 0; padding: 22px; border: 1px solid #315b73; border-radius: 12px; background: #0b2030; }
+.sdn-apply-route h3 { margin: 7px 0 13px; color: #d9f3ff; }
+.sdn-apply-route .select-control { max-width: 460px; }
+.sdn-apply-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 15px 0; }
+.sdn-apply-actions .primary-button { width: auto; }
+.sdn-applied-status { display: block; color: #67e8c3; margin: 18px 0 8px; }
+.sdn-apply-route pre { padding: 12px; border: 1px solid #28445e; border-radius: 7px; overflow-x: auto; background: #071825; color: #b7f5db; }
+.sdn-apply-route ol { padding-left: 22px; line-height: 1.9; font-size: 13px; color: #bdd3e4; }
+.sdn-apply-route a.secondary-button { display: inline-flex; margin-top: 12px; }

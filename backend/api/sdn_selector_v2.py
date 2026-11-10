@@ -88,3 +88,6 @@ original.original_app.include_router(comparacion_router)
 
 from backend.api.sdn_operacion import router as operacion_router
 original.original_app.include_router(operacion_router)
+
+from backend.api.sdn_enrutamiento_real import router as enrutamiento_router
+original.original_app.include_router(enrutamiento_router)

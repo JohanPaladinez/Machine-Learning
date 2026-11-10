@@ -1,5 +1,13 @@
 # Cambios
 
+## 1.3.0 — Enrutamiento real y arranque diario — 2026-11-10
+
+- Aplicacion explicita de una ruta convencional o de cualquiera de los cuatro modelos al flujo ICMP mediante RYU.
+- Confirmacion de reglas, puertos, identidad de red y contadores de trafico en todos los saltos de ida/regreso. Retiro estricto de reglas propias y recuperacion de operaciones pendientes.
+- Capturas y confirmacion del usuario de funcionamiento con convencional/XGBoost, retiro y ambas topologias; no es una comparacion de rendimiento.
+- Nuevos lanzadores de arranque diario RYU y consolas Mininet, guia de apagado/arranque y Reiniciar_interfaz.cmd. El arranque tras un apagado completo sigue pendiente de su primera comprobacion en VMs.
+- Pruebas sinteticas de forwarding y presentacion, sin contactar las VMs. Los registros de reglas locales, datos, pesos y entornos quedan excluidos de Git.
+
 ## Actualizacion — 2026-11-10
 
 - Comparacion de cinco rutas: convencional y una por cada modelo polinomial, Decision Tree, Random Forest y XGBoost.
@@ -8,7 +16,7 @@
 - Hosts, enlaces de acceso y controlador visibles en el mapa; inspectores de switches, puertos y metricas de enlace ampliados.
 - Consolas Mininet interactivas simultaneas; correccion v1.1 de reserva TCP y cierre de observador no iniciado. El usuario confirmo el arranque de ambas consolas.
 - Documentacion actualizada, pruebas portables y comprobaciones sinteticas de CI. Datos y pesos entrenados permanecen fuera de Git.
-- La aplicacion de rutas de la GUI al trafico real se deja pendiente expresamente; no se presenta como implementada.
+- En esta entrega anterior la aplicacion real estaba pendiente; se completa en 1.3.0, descrita arriba.
 
 ## 1.1.1 — Entrega Windows del 2026-11-09
 

@@ -1,13 +1,15 @@
 {
   "fecha": "2026-11-10",
-  "base_git": "84312a592be0a0672e6e91b875f461feb83580fd",
-  "pruebas_python": 55,
-  "pruebas_javascript": 25,
-  "pruebas_ml_sinteticas": 3,
-  "archivos_fuente_interfaz_comparados": 53,
+  "base_git": "519520ac988ab095a03eaedd5fe5d5541087cbae",
+  "pruebas_python": 72,
+  "pruebas_javascript": 29,
+  "pruebas_ml_sinteticas_ultima_entrega": 3,
+  "pruebas_ml_repetidas_en_esta_actualizacion": false,
+  "archivos_fuente_interfaz_comparados": 58,
   "codigo_interfaz_coincide": true,
   "revision_archivos_publicables": "Sin CSV, pesos, registros, entornos, archivos grandes ni patrones de credenciales en los archivos revisados.",
   "consolas_interactivas": "Funcionamiento de ambas confirmado por el usuario tras correccion v1.1.",
-  "aplicacion_rutas_gui_al_trafico": "Pendiente por decision del usuario; no se instala forwarding desde el comparador.",
+  "aplicacion_rutas_gui_al_trafico": "Aplicacion ICMP explicita mediante RYU, lectura de reglas, evidencia por contadores y retiro estricto. Usuario aporto capturas y confirmo funcionamiento y retiro en NSFNET y GEANT2.",
+  "arranque_diario": "Lanzador RYU y consolas preparados. Comprobaciones locales; primer arranque completo tras apagado en las VMs pendiente.",
   "verificacion_vm_administrativa": false
 }

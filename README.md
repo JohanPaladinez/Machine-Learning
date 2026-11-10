@@ -13,7 +13,7 @@ Laboratorio de visualizacion, telemetria y comparacion de rutas sobre **NSFNET y
 - Ventanas nuevas de enlace con delay promedio/minimo/maximo de sondas, throughput TX/RX, bits, paquetes y sondas no recibidas. Perdida ofrecida, rechazos locales y descartes de puerto/cola se identifican por separado.
 - **Dos consolas Mininet reales**, una por red, con `nodes`, `links`, `ports`, `pingall` y `telemetria`. Los recolectores miden esas mismas redes mientras se usan las consolas.
 
-**Pendiente deliberado:** aplicar desde la GUI la ruta seleccionada al trafico real y demostrar su recorrido. Los botones actuales calculan y dibujan alternativas; no instalan sus reglas. Las redes conservan el forwarding de arranque de sus recolectores para permitir comunicacion. No se afirma una mejora extremo a extremo a partir de las estimaciones de enlaces.
+**Enrutamiento real implementado:** la seccion **Aplicar y demostrar la ruta** prepara una alternativa convencional o ML, instala sus reglas ICMP mediante RYU y verifica los contadores de todos los saltos de ida y regreso. Permite cambiar de alternativa y retirar exclusivamente las reglas propias. El usuario aporto capturas y confirmo funcionamiento y retiro en NSFNET y GEANT2. La comparacion por si sola sigue sin instalar reglas. Esta evidencia demuestra el recorrido ICMP; no demuestra una mejora de rendimiento extremo a extremo. Consultar [la guia de demostracion](documentacion/GUIA_ENRUTAMIENTO_REAL_ICMP.md).
 
 Las ciudades son referencias visuales reales del laboratorio; la correspondencia historica de cada ciudad con s1…sN no ha sido verificada. Se conservan IDs y conexiones.
 
@@ -28,7 +28,13 @@ python instalar_windows.py
 
 El instalador crea `.venv`, instala dependencias y compila React. El panel y FastAPI comparten [http://127.0.0.1:8003/sdn-selector.html](http://127.0.0.1:8003/sdn-selector.html). No hace falta una tercera VM ni ejecutar Vite por separado.
 
-Para cargar cambios del backend, ejecutar `Detener_interfaz.cmd` y despues `Abrir_interfaz.cmd`; recargar el navegador con Ctrl+F5. Los `.cmd` se ejecutan con doble clic o como archivos: no se pega su contenido en PowerShell. La guia ampliada esta en [LEEME_WINDOWS.md](LEEME_WINDOWS.md).
+Para cargar cambios del backend, ejecutar `Reiniciar_interfaz.cmd` (Detener y despues Abrir); recargar el navegador con Ctrl+F5. Los `.cmd` se ejecutan con doble clic o como archivos: no se pega su contenido en PowerShell. La guia ampliada esta en [LEEME_WINDOWS.md](LEEME_WINDOWS.md).
+
+## Arranque diario y apagado
+
+Con las dos VMs encendidas: ejecutar `Arrancar_RYU.cmd`, esperar **RYU LISTO**, ejecutar `Abrir_consolas_Mininet.cmd`, esperar ambas consolas y abrir `Abrir_interfaz.cmd`. Mantener abiertas las dos consolas de red.
+
+Los lanzadores diarios reutilizan las fuentes instrumentadas y los modelos que ya existen en las VMs del laboratorio; no crean un laboratorio completo a partir de un clon vacio. No entrenan, cambian relojes ni detienen procesos desconocidos. El nuevo lanzador RYU se reviso localmente; su primer arranque completo despues de apagar las VMs queda por comprobar. Consultar [todos los comandos y el orden de apagado](documentacion/GUIA_APAGADO_Y_ARRANQUE_SDN.md).
 
 ## Consolas interactivas de Mininet
 
@@ -41,7 +47,7 @@ mininet-nsfnet>
 
 En cada consola se pueden ejecutar `nodes`, `links`, `net`, `ports`, `pingall` y `telemetria`. GEANT2 usa switches nc/hosts nh; NSFNET usa ns/nsh para evitar colisiones. `exit` o cerrar SSH detiene solo la red de esa terminal. Mantener las dos abiertas.
 
-La version 1.1 reserva el observador con reutilizacion de direccion TCP, sin compartir un listener activo, antes de crear Mininet. El usuario confirmo el funcionamiento de ambas consolas tras esta correccion. Los resultados concretos de `pingall` y la demostracion de rutas reales siguen siendo comprobaciones independientes.
+La version 1.1 reserva el observador con reutilizacion de direccion TCP, sin compartir un listener activo, antes de crear Mininet. El usuario confirmo el funcionamiento de ambas consolas tras esta correccion. El usuario confirmo tambien el trafico por las rutas aplicadas y su retiro en ambas topologias. Los resultados de `pingall` y las mediciones de rendimiento son comprobaciones diferentes.
 
 El lanzador **requiere las carpetas instrumentadas y configuraciones existentes en la VM**. Identifica su propietario, conserva una copia de sus fuentes y reemplaza limpiamente solo esa sesion. No ejecuta una limpieza global ni borra modelos o datasets. Consultar [la guia de consolas](consolas_mininet_v1/LEEME.md).
 
@@ -82,6 +88,7 @@ El ajuste manual de relojes se conserva en `Alinear_relojes_VMs.cmd`, como herra
 
 - `backend/`, `frontend/app/`: API, calculos, inspectores y panel actual.
 - `consolas_mininet_v1/`, `Instalar_consolas_Mininet.cmd`: consolas reales y telemetria.
+- `arranque_diario_sdn/`, `Arrancar_RYU.cmd`, `Abrir_consolas_Mininet.cmd`: arranque diario sobre las VMs existentes.
 - `comparacion_ml_sdn/`: scripts del experimento de cuatro regresores y dependencias RYU Python 3.6.
 - `rutas_cinco_modelos_ryu/`: inferencia adicional del puerto 8011.
 - `laboratorio/`: fuentes de recuperacion de la entrega anterior; no son una extraccion nueva de las VMs actuales. Su documentacion se conserva como historial.
