@@ -85,3 +85,6 @@ original.original_app.include_router(predicciones_enlace_router_v1)
 
 from backend.api.sdn_comparacion import router as comparacion_router
 original.original_app.include_router(comparacion_router)
+
+from backend.api.sdn_operacion import router as operacion_router
+original.original_app.include_router(operacion_router)

@@ -1,72 +1,45 @@
-# SDN/KDN con comparacion de rutas en Windows
+# Usar SDN/KDN en Windows — version actual
 
-La aplicacion se ejecuta directamente en Windows. Solo necesitas las VMs de RYU y Mininet; la VM Ubuntu de la interfaz puede permanecer apagada.
+El panel React y FastAPI se ejecutan en Windows, puerto 8003. Mininet y RYU siguen en sus VMs. Esta guia sustituye las instrucciones de la antigua tercera VM y de las cuatro tarjetas por criterio.
 
-## Abrir
+## Instalar y abrir
 
-Abre esta carpeta en el Explorador de archivos y haz doble clic en **Abrir_interfaz.cmd**. El lanzador inicia el backend y abre el panel en:
+En un clon nuevo, ejecutar `python instalar_windows.py` desde la raiz. Despues hacer doble clic en `Abrir_interfaz.cmd`. Abrir http://127.0.0.1:8003/sdn-selector.html. Node solo se utiliza para compilar; no hace falta iniciar Vite por separado.
 
-**http://127.0.0.1:8003/sdn-selector.html**
+Para cargar cambios de backend, ejecutar `Detener_interfaz.cmd` y luego `Abrir_interfaz.cmd`. Recargar Ctrl+F5. Los archivos cmd se ejecutan; su contenido no se pega en PowerShell. El gestor comprueba el contrato del servidor y la identidad de los procesos propios. No detiene servicios ajenos para liberar puertos.
 
-Esta es la version nueva con comparacion de rutas. La version Windows anterior utiliza el puerto 8002. El nuevo lanzador no detiene esa version ni otros servicios para liberar puertos.
+## Redes y consolas
 
-El panel y FastAPI comparten el puerto 8003. Node se utiliza para compilar; no tienes que iniciar Vite por separado para usar el panel. Puedes cerrar la ventana del lanzador cuando termine. El servicio sigue en segundo plano hasta que lo detengas o apagues Windows.
+Mantener RYU, sus controladores y los servicios de modelos disponibles. Ejecutar `Instalar_consolas_Mininet.cmd` para abrir las dos consolas SSH y autenticar Mininet/sudo. El lanzador requiere las fuentes instrumentadas existentes en la VM y conserva sus archivos anteriores. La correccion 1.1 de la reserva TCP ya fue confirmada por el usuario.
 
-Para cerrar esta version, haz doble clic en **Detener_interfaz.cmd**. Despues de reiniciar Windows, vuelve a abrir **Abrir_interfaz.cmd**.
+Se esperan `mininet-geant2>` y `mininet-nsfnet>`. En cada una se admiten `nodes`, `links`, `net`, `ports`, `pingall` y `telemetria`. La medicion continua en un hilo sobre esa misma red; `exit` o cerrar SSH termina solo esa topologia. Mantener ambas ventanas abiertas. No usar limpieza global para resolver un fallo de una sola sesion.
 
-Desde la version 1.1.1, el lanzador comprueba que el backend devuelva los cuatro criterios. Si encuentra una ejecucion anterior propia, la reinicia en lugar de reutilizarla. La identidad del proceso se verifica antes de cerrarlo; los servicios de RYU y Mininet no se detienen.
+En el panel seleccionar NSFNET o GEANT2 y esperar identidad de red verificada y telemetria reciente. Despues de recrear una red, seleccionar su sesion nueva. El estado de FastAPI, de RYU y del modelo se comprueba por separado.
 
-## Usar las funciones nuevas
+## Comparar las cinco rutas
 
-1. Enciende RYU y Mininet y deja ejecutandose sus servicios y redes instrumentadas. Encender las VMs no confirma que los servicios hayan arrancado.
-2. En la cabecera, selecciona NSFNET o GEANT2. El backend elige el observador configurado para esa topologia. Auto conserva la seleccion mientras este disponible.
-3. Espera el estado de red verificada. El estado del modelo y las mediciones se comprueban por separado.
-4. En **Enrutamiento**, selecciona origen y destino distintos. Puedes calcular una ruta individual o pulsar **Comparar las 4 rutas**.
-5. Se muestran cuatro criterios: menos saltos (azul), retardo configurado (naranja), inverso de capacidad nominal (verde) y prediccion ML (violeta). Cada tarjeta conserva su costo y unidad. La tabla evalua los cuatro caminos con las mismas predicciones por enlace y la misma ventana.
-6. Las casillas permiten ocultar trazados. **Ver solo este trazado** aisla uno; **Mostrar todos** restaura los cuatro. El dorado identifica enlaces compartidos por varios criterios visibles. Se indica cuando varios criterios eligen el mismo camino, sin forzar diferencias.
+1. Elegir origen y destino distintos en Enrutamiento.
+2. Pulsar **Comparar las 5 rutas**.
+3. Revisar convencional (1/capacidad), polinomial, Decision Tree, Random Forest y XGBoost. Cada modelo produce pesos para Dijkstra; no se instala una ruta al pulsar este boton.
+4. Las cinco alternativas se evalúan con los mismos siete indicadores y la misma ventana medida de enlaces. Las previsiones propias de cada modelo aparecen aparte. Las rutas pueden coincidir sin que exista un error.
+5. Las casillas y **Ver solo este trazado** controlan el mapa. El dorado identifica tramos compartidos. **Mostrar todos** restaura los trazados visibles.
 
-ML predice las metricas por enlace; Dijkstra elige el camino usando un costo QoS. La comparacion no aplica esas rutas al trafico. Los resultados caducan al superar 120 segundos desde el fin de la ventana usada. Si faltan entradas completas y recientes, se informa la indisponibilidad de ML.
+La comparacion completa se conserva en el navegador con su fecha, ventana e identidad para la sustentacion. **Actualizar comparacion** pide inferencias nuevas; **Recuperar ultima comparacion guardada** recupera la ultima completa; **Limpiar comparacion** elimina esa copia local. Una respuesta parcial no sustituye la ultima completa. Las peticiones nuevas mantienen el limite de 120 segundos y las comprobaciones de sesion/entradas; un resultado archivado no se anuncia como actual ni se dibuja sobre otra sesion.
 
-Sin ML disponible, se conservan los tres calculos clasicos. Si falta retardo configurado, solo ese criterio se marca como no disponible. Los datos ausentes no se reemplazan por cero. Al caducar ML, se retiran sus predicciones y se conservan los caminos clasicos como referencia de configuracion.
+## Evaluacion de modelos e inspector
 
-## Mapas y nombres de lugares
+La evaluacion de los cuatro modelos esta en un desplegable dentro de Enrutamiento. **Cargar informe de RYU** importa los JSON de validacion y test descriptivo, sin cargar PKL en Windows. Muestra MSE, RMSE, MAE, R², muestras, tiempos y predicciones fuera de rango, por variable/topologia/procedencia. Importar informes no cambia el modelo conectado y no verifica por si solo que ambos archivos provengan de la misma ejecucion.
 
-El mapa incluye las vistas **Mapa geografico** y **Esquema de red**. NSFNET usa ciudades de Estados Unidos; GEANT2 usa ciudades europeas. Puedes desplazar y acercar el mapa y consultar la ciudad, el pais y las coordenadas aproximadas en los detalles de cada nodo. Los nombres tambien aparecen en origen/destino, caminos e inventario de enlaces.
+El servicio 8011 atiende las cinco rutas. El inspector de predicciones de enlaces y la ruta ML individual conservan 8010. XGBoost se selecciono con validacion; el test posterior es descriptivo porque ya se habia examinado. Los errores se calculan con predicciones crudas; los ajustes fisicos de las nuevas inferencias se muestran aparte.
 
-Las ciudades son ubicaciones reales asignadas como **referencias del laboratorio**. La correspondencia entre s1...sN y esas ciudades no es una identificacion historica verificada: los perfiles numerados originales no aportan esa correspondencia. Se conservan los IDs, enlaces, capacidades y retardos; las coordenadas no cambian los pesos de las rutas. La asignacion solo se aplica cuando coincide exactamente el grafo esperado.
+Seleccionar un switch muestra su configuracion e informacion operativa de OFCTL REST: fabricante, plataforma, versiones, puertos y contadores. Seleccionar un enlace muestra ambos puertos y la ventana de sondas. Los campos ausentes aparecen como no disponibles. Drops, errores, rechazos locales y sondas no recibidas son magnitudes diferentes.
 
-La cartografia de Natural Earth se incluye localmente y no necesita conexion a un servicio de mapas ni claves. Fuente: https://www.naturalearthdata.com/about/terms-of-use/ (dominio publico).
+El mapa muestra hosts, acceso y controlador, con casillas para ocultarlos si dificultan ver las rutas. Las conexiones de control son logicas; las posiciones del controlador/hosts son esquematicas. Las ciudades no certifican una correspondencia historica de los IDs.
 
-## Aplicar esta actualizacion
+## Diagnostico y alcance
 
-Con RYU y Mininet funcionando, ejecuta **Detener_interfaz.cmd** y despues **Abrir_interfaz.cmd**, ambos en esta carpeta de Windows. Recarga el navegador con Ctrl+F5 si conserva la vista anterior. Solo se reinicia esta aplicacion Windows; no hace falta recrear las redes ni volver a entrenar el modelo.
+Editar `configuracion_windows.json` si cambian las IP y reiniciar el servidor. Los registros estan en `.ejecucion_windows/sesion_.../api.log`. Encender una VM no confirma que los servicios esten iniciados. Si faltan datos recientes, comprobar servicio, identidad y tiempos; no rellenar entradas ML con ceros.
 
-Si aparecen capacidad y ML pero las tarjetas de saltos y retardo no tienen resultados, comprueba que no siga abierto el backend anterior. Ese backend devuelve dos rutas y no permite concluir que falte configuracion en la red. La interfaz actual detecta esa respuesta incompatible y muestra instrucciones de reinicio, en lugar de atribuirla a datos ausentes.
+`Alinear_relojes_VMs.cmd` es una herramienta manual opcional que cambia la hora de las VMs usando Windows como referencia. No se ejecuta automaticamente y no configura NTP. Solo usarla cuando se haya decidido ese ajuste; las ventanas que cruzan un salto temporal se descartan.
 
-## Direcciones de tus VMs
-
-La configuracion esta en **configuracion_windows.json**. Se preparo con las ultimas direcciones que usamos en este chat:
-
-| Servicio | Direccion |
-|---|---|
-| NSFNET en Mininet | http://192.168.56.107:8769 |
-| GEANT2 en Mininet | http://192.168.56.107:8768 |
-| REST RYU para NSFNET | http://192.168.56.108:18081 |
-| REST RYU para GEANT2 | http://192.168.56.108:18080 |
-| Modelo guardado en RYU | http://192.168.56.108:8010 |
-
-Puertos OpenFlow: NSFNET 16654 y GEANT2 16653. El repositorio de tu companero usa Mininet en .103; esta copia Windows usa .107. Si ahora tu Mininet tiene otra IP, cambia las dos URL del observador en el JSON y reinicia solo esta aplicacion. No necesitas recompilar para cambiar esas direcciones.
-
-Windows debe poder alcanzar esos servicios. Un fallo de conexion puede indicar una direccion distinta, un servicio detenido o un problema de red; no confirma por si solo que la VM este apagada. SSH sirve para operar las VMs, pero el panel consulta sus API HTTP directamente.
-
-El modelo y su evaluacion permanecen en RYU. El dataset consolidado de 20 horas tambien permanece alli. No se entrena ni se copia el modelo a Windows. Esta instalacion no cambia relojes ni configura NTP. Si las ventanas aparecen antiguas o futuras, hay que comprobar los tiempos antes de modificar nada.
-
-## Origen y alcance
-
-Codigo adaptado de **Sergio777gg/sdn-kdn-rutas-ml**, commit **aeab8d50f7de505672b3940c9905ed9ee5929194**. Se conserva la formula QoS. La comparacion local se amplio a los cuatro criterios; tambien se agregaron geografia, arranque nativo, configuracion de servicios y servidor del panel en Windows. No se ejecutan los scripts Linux de activacion ni de recuperacion de redes. Estos cambios no se publicaron en GitHub.
-
-La seleccion sigue siendo compartida por los navegadores que se conecten a esta instancia local. Los pesos iniciales son decisiones de diseno, no coeficientes aprendidos. Un costo QoS menor no demuestra una mejora de rendimiento medida en trafico real.
-
-Los registros estan en **.ejecucion_windows/sesion_.../api.log** y la identidad de la ejecucion actual, en **.ejecucion_windows/estado.json**. El entorno Python es privado, en **.venv**. Conserva esta carpeta completa en su ubicacion actual.
-
-Para reinstalar dependencias o recompilar despues de editar, ejecuta **python instalar_windows.py** desde esta carpeta. El instalador compila el panel para la API local del puerto 8003.
+Aplicar y demostrar el recorrido real elegido desde la GUI sigue pendiente. Las medidas de enlace y el costo QoS no acreditan una mejora extremo a extremo. El dataset, los modelos y los resultados originales permanecen en RYU y no se reentrenan para abrir esta version. Consultar README.md y documentacion/ESTADO_ACTUAL.md.

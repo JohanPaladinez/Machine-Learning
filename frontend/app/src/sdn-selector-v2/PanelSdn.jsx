@@ -1,9 +1,10 @@
 import ComparacionRutas from "./ComparacionRutas.jsx";
 import PrediccionesEnlaceV1 from "./PrediccionesEnlaceV1.jsx";
 import ModeloComunV1 from "./ModeloComunV1.jsx";
+import ModelosMl from "./ModelosMl.jsx";
 import GeographicBackdrop from "../geografia/GeographicBackdrop.jsx";
 import { fitGeography, projection } from "../geografia/geography.js";
-import { ROUTES, edgeCriteria, withoutForecasts } from "./comparisonView.js";
+import { ROUTES, edgeCriteria, comparisonMatchesNetwork } from "./fiveModelView.js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import cytoscape from "cytoscape";
 import {
@@ -12,6 +13,8 @@ import {
   ShieldCheck, SlidersHorizontal,
 } from "lucide-react";
 import { LiveMetrics } from "../sdn-vivo-v1/LiveMetrics.jsx";
+import { infrastructureElements, infrastructureKey } from './infrastructure.js';
+import { InfrastructureDetails, SwitchOperational, LinkOperational } from './OperationalDetails.jsx';
 import { DEMO, POLICIES, backendPayload, dijkstra, edgeKey, nodeKey, parseTopologyDocument, validateBackendRoute } from "../sdn-vivo-v1/graph.js";
 
 const navigation = [
@@ -26,7 +29,7 @@ const format = (n, decimals = 3) => n == null ? "—" : Number(n).toLocaleString
 const apiLabel = { checking: "Comprobando", online: "Responde", offline: "Sin conexión" };
 const ROUTE_POLICIES = {
   ...POLICIES,
-  ml: { label: "Ruta inteligente (ML)", unit: "QoS normalizado", description: "Minimiza el costo QoS direccional con predicciones recientes del modelo. No instala reglas ni modifica el tráfico." },
+  ml: { label: "ML · modelo actual del inspector", unit: "QoS normalizado", description: "Este cálculo individual conserva el servicio del inspector. Para usar Polinomial, Decision Tree, Random Forest y XGBoost, pulsa Comparar las 5 rutas. No instala reglas ni modifica el tráfico." },
 };
 
 function PanelHeading({ icon: Icon, title, caption, children }) {
@@ -57,6 +60,9 @@ export default function PanelSdn({ live }) {
   const [manualTopology, setTopology] = useState(DEMO);
   const topology = live ? live.topology : manualTopology;
   const [mapLayout, setMapLayout] = useState("geographic");
+  const [showHosts, setShowHosts] = useState(true);
+  const [showControl, setShowControl] = useState(true);
+  const controllerIp = live?.snapshot.controller?.ip;
   const geographic = mapLayout === "geographic" && Boolean(topology.geography);
   const [mapMessage, setMapMessage] = useState("Cargando el mapa, si está disponible…");
   const [mapError, setMapError] = useState("");
@@ -68,19 +74,10 @@ export default function PanelSdn({ live }) {
   const [engine, setEngine] = useState("local");
   const [storedRouteResult, setRouteResult] = useState(null);
   const [comparisonStored, setComparison] = useState(null);
-  const [visibility, setVisibility] = useState({ hops: true, delay: true, capacity: true, ml: true });
-  const [clock, setClock] = useState(Date.now);
-  useEffect(() => { const timer = setInterval(() => setClock(Date.now()), 1000); return () => clearInterval(timer); }, []);
-  const intelligentExpired = storedRouteResult?.policy === "ml"
-    && clock / 1000 - storedRouteResult.ml.feature_end_epoch_s > storedRouteResult.ml.max_age_s;
-  const routeResult = intelligentExpired || (live && (!live.ready || storedRouteResult?.graphVersion !== live.graphVersion)) ? null : storedRouteResult;
-  const comparisonCurrent = live?.ready && comparisonStored?.topology_instance_id === live.instanceId
-    && comparisonStored?.graph_version === live.graphVersion
-    && comparisonStored?.selection_revision === live.snapshot.selection_revision;
-  const comparisonExpired = comparisonCurrent && comparisonStored?.ml?.status === "available"
-    && clock / 1000 - comparisonStored.ml.feature_end_epoch_s > comparisonStored.ml.max_age_s;
-  const comparison = useMemo(() => !comparisonCurrent ? null : comparisonExpired
-    ? withoutForecasts(comparisonStored) : comparisonStored, [comparisonCurrent, comparisonExpired, comparisonStored]);
+  const [visibility, setVisibility] = useState(Object.fromEntries(ROUTES.map(r => [r.key, true])));
+  const routeResult = live && (!live.ready || storedRouteResult?.graphVersion !== live.graphVersion) ? null : storedRouteResult;
+  const comparison = comparisonStored;
+  const comparisonForMap = comparisonMatchesNetwork(comparisonStored, live) ? comparisonStored : null;
   const [routeError, setRouteError] = useState("");
   const [routeLoading, setRouteLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -91,15 +88,18 @@ export default function PanelSdn({ live }) {
   const [lastChecked, setLastChecked] = useState("—");
   const [healthRevision, setHealthRevision] = useState(0);
 
-  const clearRoute = useCallback(() => {
+  const clearIndividualRoute = useCallback(() => {
     routeRevisionRef.current += 1;
     routeAbortRef.current?.abort();
     routeAbortRef.current = null;
     setRouteResult(null);
-    setComparison(null);
     setRouteError("");
     setRouteLoading(false);
   }, []);
+  const clearRoute = useCallback(() => {
+    clearIndividualRoute();
+    setComparison(null);
+  }, [clearIndividualRoute]);
 
   const activateTopology = useCallback((profile) => {
     clearRoute();
@@ -171,17 +171,19 @@ export default function PanelSdn({ live }) {
   useEffect(() => {
     const count = topology.nodes.length;
     const project = geographic ? projection(topology.geography) : null;
+    const positions = new Map(topology.nodes.map((node, i) => [node.id, geographic ? project.point(node.longitude, node.latitude)
+      : { x: 220 * Math.cos(i * Math.PI * 2 / count), y: 220 * Math.sin(i * Math.PI * 2 / count) }]));
     const cy = cytoscape({
       container: topologyRef.current,
       elements: [
-        ...topology.nodes.map((node, i) => ({ data: { id: nodeKey(node.id), nodeId: node.id,
+        ...topology.nodes.map((node) => ({ data: { id: nodeKey(node.id), nodeId: node.id,
           label: node.city ? `${node.city}\n${node.id.toUpperCase()}` : node.label,
           labelAlign: node.labelAlign || "right", labelValign: node.labelValign || "bottom",
           labelMarginX: node.labelAlign === "left" ? -10 : 10,
           labelMarginY: node.labelValign === "top" ? -8 : node.labelValign === "bottom" ? 8 : 0 },
-          position: geographic ? project.point(node.longitude, node.latitude)
-            : { x: 220 * Math.cos(i * Math.PI * 2 / count), y: 220 * Math.sin(i * Math.PI * 2 / count) } })),
+          position: positions.get(node.id) })),
         ...topology.links.map((e) => ({ data: { id: edgeKey(e.id), linkId: e.id, source: nodeKey(e.source), target: nodeKey(e.target), label: `${format(e.capacity, 1)} Mbps` } })),
+        ...infrastructureElements(topology, positions, { ip: controllerIp }, showHosts, showControl),
       ],
       style: [
         { selector: "node", style: { "background-color": geographic ? "#163b52" : "#142d49", "border-color": "#38bdf8", "border-width": geographic ? 3 : 2,
@@ -198,30 +200,40 @@ export default function PanelSdn({ live }) {
         { selector: "edge.route-edge", style: { "line-color": "#34d399", width: 5, "z-index": 999 } },
         { selector: "edge.route-ml", style: { "line-color": "#c084fc", "line-style": "dashed" } },
         { selector: "node.route-node", style: { "background-color": "#14532d", "border-color": "#4ade80", "border-width": 4 } },
-        { selector: "edge.comparison-hops", style: { "line-color": "#38bdf8", width: 6, "line-style": "solid", "z-index": 1000 } },
-        { selector: "edge.comparison-delay", style: { "line-color": "#fb923c", width: 6, "line-style": "dashed", "z-index": 1000 } },
-        { selector: "edge.comparison-capacity", style: { "line-color": "#34d399", width: 6, "line-style": "dotted", "z-index": 1000 } },
-        { selector: "edge.comparison-ml", style: { "line-color": "#c084fc", width: 5, "line-style": "dashed", "z-index": 1001 } },
+        { selector: "edge.comparison-conventional", style: { "line-color": "#94a3b8", width: 6, "z-index": 1000 } },
+        { selector: "edge.comparison-polinomial", style: { "line-color": "#38bdf8", width: 6, "line-style": "solid", "z-index": 1000 } },
+        { selector: "edge.comparison-decision-tree", style: { "line-color": "#fb923c", width: 6, "line-style": "dashed", "z-index": 1000 } },
+        { selector: "edge.comparison-random-forest", style: { "line-color": "#34d399", width: 6, "line-style": "dotted", "z-index": 1000 } },
+        { selector: "edge.comparison-xgboost", style: { "line-color": "#c084fc", width: 5, "line-style": "dashed", "z-index": 1001 } },
         { selector: "edge.comparison-shared", style: { "line-color": "#fbbf24", width: 7, "line-style": "solid", "z-index": 1002,
           label: "data(comparisonLabel)", "font-size": geographic ? 18 : 10 } },
         { selector: "node:selected", style: { "border-color": "#f6c777", "border-width": 5 } },
         { selector: "edge:selected", style: { "line-color": "#f6c777", width: 5 } },
+        { selector: 'node[kind="host"]', style: { shape: 'rectangle', width: geographic ? 17 : 24, height: geographic ? 17 : 24,
+          'background-color': '#12483c', 'border-color': '#34d399', 'font-size': geographic ? 15 : 10,
+          'text-halign': 'center', 'text-valign': 'bottom', 'text-margin-x': 0, 'text-margin-y': 4 } },
+        { selector: 'node[kind="controller"]', style: { shape: 'round-rectangle', width: geographic ? 66 : 75, height: geographic ? 34 : 36,
+          'background-color': '#39264e', 'border-color': '#c084fc', 'font-size': geographic ? 16 : 11,
+          'text-halign': 'center', 'text-valign': 'center', 'text-margin-x': 0, 'text-margin-y': 0 } },
+        { selector: 'edge[kind="access"]', style: { 'line-color': '#34d399', width: 1.5, label: '' } },
+        { selector: 'edge[kind="control"]', style: { 'line-color': '#c084fc', 'line-style': 'dashed', opacity: 0.35, width: 1, label: '', 'z-index': 0 } },
+        { selector: '.infra-unverified', style: { opacity: 0.4 } },
       ],
       layout: geographic || !count ? { name: "preset", fit: false } : { name: "cose", animate: false, randomize: false, padding: 50, nodeRepulsion: 450000, idealEdgeLength: topology.geography ? 140 : 105, nodeDimensionsIncludeLabels: true },
       wheelSensitivity: 0.2,
     });
     cyRef.current = cy;
     const syncMap = () => geoLayerRef.current?.setAttribute("transform", `translate(${cy.pan().x},${cy.pan().y}) scale(${cy.zoom()})`);
-    fitMapRef.current = () => { if (!cy.destroyed()) { if (geographic) fitGeography(cy, topology.geography); else cy.fit(undefined, 50); syncMap(); } };
+    fitMapRef.current = () => { if (!cy.destroyed()) { if (geographic) { fitGeography(cy, topology.geography); if (showControl || showHosts) cy.fit(cy.elements(), 50); } else cy.fit(undefined, 50); syncMap(); } };
     cy.on("pan zoom", syncMap);
-    if (geographic) { fitGeography(cy, topology.geography); syncMap(); cy.nodes().lock(); }
-    cy.on("tap", "node", (event) => setSelected({ type: "node", id: event.target.data("nodeId") }));
-    cy.on("tap", "edge", (event) => setSelected({ type: "link", id: event.target.data("linkId") }));
+    if (geographic) { fitMapRef.current(); cy.nodes().lock(); }
+    cy.on("tap", "node", (event) => setSelected({ type: event.target.data('kind') || 'node', id: event.target.data('owner') || event.target.data("nodeId") || '' }));
+    cy.on("tap", "edge", (event) => setSelected({ type: event.target.data('kind') || 'link', id: event.target.data('owner') || event.target.data("linkId") }));
     cy.on("tap", (event) => { if (event.target === cy) setSelected(null); });
     const observer = new ResizeObserver(() => { if (!cy.destroyed()) { cy.resize(); if (geographic) fitMapRef.current?.(); } });
     observer.observe(topologyRef.current);
     return () => { observer.disconnect(); cy.destroy(); cyRef.current = null; };
-  }, [topology, geographic]);
+  }, [topology, geographic, controllerIp, showHosts, showControl]);
 
   useEffect(() => {
     const cy = cyRef.current;
@@ -231,35 +243,41 @@ export default function PanelSdn({ live }) {
       routeResult.path.forEach((id) => cy.getElementById(nodeKey(id)).addClass("route-node"));
       routeResult.edgeIds.forEach((id) => cy.getElementById(edgeKey(id)).addClass(routeResult.policy === "ml" ? "route-edge route-ml" : "route-edge"));
     }
-  }, [topology, geographic, routeResult]);
+  }, [topology, geographic, routeResult, showHosts, showControl]);
 
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy) return;
-    cy.edges().removeClass("comparison-hops comparison-delay comparison-capacity comparison-ml comparison-shared");
-    if (!comparison) return;
+    cy.edges().removeClass("comparison-conventional comparison-polinomial comparison-decision-tree comparison-random-forest comparison-xgboost comparison-shared");
+    if (!comparisonForMap) return;
     cy.edges().forEach(edge => {
-      const using = edgeCriteria(comparison, visibility, edge.data("linkId"));
-      edge.data("comparisonLabel", using.length > 1 ? `${using.length} criterios` : "");
+      const using = edgeCriteria(comparisonForMap, visibility, edge.data("linkId"));
+      edge.data("comparisonLabel", using.length > 1 ? `${using.length} rutas` : "");
       if (using.length) edge.addClass(using.length > 1 ? "comparison-shared" : using[0].className);
     });
-  }, [topology, geographic, comparison, visibility]);
+  }, [topology, geographic, comparisonForMap, visibility, showHosts, showControl]);
 
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy) return;
     cy.elements().unselect();
-    if (selected) cy.getElementById(selected.type === "node" ? nodeKey(selected.id) : edgeKey(selected.id)).select();
-  }, [topology, geographic, selected]);
+    if (selected) cy.getElementById(selected.type === "node" ? nodeKey(selected.id) : selected.type === 'link' ? edgeKey(selected.id) : infrastructureKey(selected.type, selected.id)).select();
+  }, [topology, geographic, selected, showHosts, showControl]);
 
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy || !live) return;
     cy.edges().forEach((edge) => {
+      if (edge.data('kind')) return;
       const state = live.edgeStates.get(edge.data("linkId"));
       edge.toggleClass("sdn-edge-down", !live.ready || state?.state !== "up");
     });
-  }, [live, topology, geographic]);
+    cy.elements('[kind="control"], [kind="controller"]').toggleClass('infra-unverified', !live.ready || !live.snapshot.ryu?.identity_verified);
+    cy.elements('[kind="host"], [kind="access"]').forEach(element => {
+      const host = live.snapshot.hosts_runtime?.find(h => h.switch === element.data('owner'));
+      element.toggleClass('infra-unverified', !live.ready || host?.state !== 'up');
+    });
+  }, [live, topology, geographic, showHosts, showControl]);
 
   const node = selected?.type === "node" ? topology.nodes.find((n) => n.id === selected.id) : null;
   const link = selected?.type === "link" ? topology.links.find((e) => e.id === selected.id) : null;
@@ -373,18 +391,23 @@ export default function PanelSdn({ live }) {
               <button type="button" aria-pressed={!geographic} onClick={() => setMapLayout("logical")}>Esquema de red</button>
               {topology.geography && <span>{topology.geography.title} · {topology.nodes.length} ubicaciones</span>}
             </div>
+            <div className="sdn-infrastructure-controls"><label><input type="checkbox" checked={showHosts} onChange={e => setShowHosts(e.target.checked)} />Hosts y acceso</label><label><input type="checkbox" checked={showControl} onChange={e => setShowControl(e.target.checked)} />Controlador y conexiones OpenFlow</label></div>
             <div className={`sdn-geography-stage ${geographic ? `is-geographic region-${topology.geography.region}` : ""}`}>
               {geographic && <GeographicBackdrop geography={topology.geography} layerRef={geoLayerRef} />}
               <div className="topology-canvas" ref={topologyRef} role="img" aria-label={`Mapa interactivo de ${topology.name}: ${topology.nodes.length} nodos y ${topology.links.length} enlaces. Las ciudades son referencias visuales del laboratorio; los identificadores de red se conservan.`} />
             </div>
-            <div className="topology-footer"><div className="legend-item"><span className="legend-node" />Nodo</div><div className="legend-item"><span className="legend-line" />Enlace físico</div><div className="legend-item"><span className="sdn-legend-inspected" />Selección</div></div>
-            {comparison && <div className="sdn-map-route-key">{ROUTES.map(r => <span key={r.key} style={{ color: r.color }}><i style={{ background: r.color }} />{r.short}</span>)}<span style={{ color: "#fbbf24" }}><i style={{ background: "#fbbf24" }} />Compartido</span></div>}
+            <div className="topology-footer"><div className="legend-item"><span className="legend-node" />Switch</div><div className="legend-item"><span className="legend-line" />Enlace de núcleo</div><div className="legend-item"><span className="sdn-legend-host" />Host</div><div className="legend-item"><span className="sdn-legend-control" />Control OpenFlow</div><div className="legend-item"><span className="sdn-legend-inspected" />Selección</div></div>
+            {comparisonForMap && <div className="sdn-map-route-key">{ROUTES.map(r => <span key={r.key} style={{ color: r.color }}><i style={{ background: r.color }} />{r.short}</span>)}<span style={{ color: "#fbbf24" }}><i style={{ background: "#fbbf24" }} />Compartido</span></div>}
             <p className="sdn-muted">{geographic ? "Arrastra el mapa para desplazarlo y usa la rueda para acercar. Selecciona un enlace para consultar su capacidad y sus métricas." : "Las etiquetas de enlace muestran capacidad nominal. Arrastra los nodos para reorganizar el esquema."}</p>
             {topology.geography && <details className="sdn-geography-note"><summary>Sobre las ubicaciones</summary><p>{topology.geography.note}</p><p>Coordenadas aproximadas de las ciudades. La posición del mapa no determina el retardo ni la capacidad de los enlaces.</p><a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noreferrer">Cartografía: Natural Earth · dominio público</a></details>}
             <details className="sdn-node-list"><summary>Seleccionar nodo o ciudad mediante teclado</summary><div className="sdn-node-buttons">{topology.nodes.map(n => <button className="secondary-button" key={n.id} onClick={() => setSelected({ type: "node", id: n.id })}>{n.label}</button>)}</div></details>
+            <details className="sdn-node-list"><summary>Seleccionar hosts o controlador mediante teclado</summary><div className="sdn-node-buttons">{topology.nodes.filter(n => n.host).map(n => <button className="secondary-button" key={n.id} onClick={() => setSelected({ type: 'host', id: n.id })}>{n.host}</button>)}{controllerIp && <button className="secondary-button" onClick={() => setSelected({ type: 'controller', id: '' })}>RYU · {controllerIp}</button>}</div></details>
           </article>
 
           <article className="panel sdn-inspector" id="details"><PanelHeading icon={SlidersHorizontal} title="Detalles del elemento" caption={node ? `Switch ${node.label}` : link ? `Enlace ${labels.get(link.source)} ↔ ${labels.get(link.target)}` : "Selecciona un elemento del mapa"} />
+            {selected && !['node', 'link'].includes(selected.type) && <InfrastructureDetails selected={selected} topology={topology} snapshot={live?.snapshot} />}
+            {node && live && <SwitchOperational key={`${live.instanceId}:${node.id}`} live={live} node={node} />}
+            {link && live && <LinkOperational key={`${live.instanceId}:${link.id}`} live={live} link={link} />}
             {!selected && <div className="sdn-inspector-placeholder"><Network size={35} /><strong>Explora la red</strong><p>Haz clic en un switch o en una conexión para ver su configuración.</p><span>También puedes usar la tabla de enlaces.</span></div>}
             {node && <><dl className="sdn-details">{node.city && <><Detail label="Ubicación de referencia">{node.city}</Detail><Detail label="País">{node.country}</Detail>{node.state && <Detail label="Estado">{node.state}</Detail>}<Detail label="Latitud aproximada">{format(node.latitude, 3)}°</Detail><Detail label="Longitud aproximada">{format(node.longitude, 3)}°</Detail></>}<Detail label="Identificador">{node.id}</Detail><Detail label="Switch en Mininet">{node.runtimeSwitch}</Detail><Detail label="DPID">{node.dpid}</Detail><Detail label="Host asociado">{node.host}</Detail><Detail label="IP del host">{node.hostIp}</Detail><Detail label="Puerto al host">{format(node.hostPort, 0)}</Detail><Detail label="Enlaces vecinos">{format(neighbors.length, 0)}</Detail></dl>{!topology.illustrative && <p className="sdn-muted">{topology.hostAttachmentSource || "Consulta la procedencia del mapa antes de interpretar la asociación de hosts."}</p>}<div className="sdn-inline-actions"><button className="secondary-button" onClick={() => { clearRoute(); setOrigin(node.id); }}>Usar como origen</button><button className="secondary-button" onClick={() => { clearRoute(); setDestination(node.id); }}>Usar como destino</button></div><h3 className="sdn-subheading">Enlaces del nodo</h3><div className="sdn-neighbors">{neighbors.map((e) => <button key={e.id} onClick={() => setSelected({ type: "link", id: e.id })}><span>{labels.get(e.source)} ↔ {labels.get(e.target)}</span><span>{format(e.capacity)} Mbps <ArrowRight size={13} /></span></button>)}</div></>}
             {link && <><dl className="sdn-details"><Detail label="Estado del enlace">{live?.edgeStates.get(link.id)?.state === "up" && live.ready ? "Activo" : "No disponible / sin verificar"}</Detail><Detail label="Capacidad nominal">{format(link.capacity)} Mbps</Detail><Detail label="Retardo configurado">{link.delay === null ? "No disponible" : `${format(link.delay)} ms`}</Detail><Detail label={`Puerto en ${labels.get(link.source)}`}>{format(link.portU, 0)}</Detail><Detail label={`Puerto en ${labels.get(link.target)}`}>{format(link.portV, 0)}</Detail><Detail label="Límite de cola">{link.queue === null ? "No disponible" : `${format(link.queue, 0)} paquetes`}</Detail><Detail label="Identificador">{link.id}</Detail></dl>{live ? <><LiveMetrics live={live} linkId={link.id} /><PrediccionesEnlaceV1 live={live} linkId={link.id} apiUrl={apiUrl} /></> : <LinkMetrics />}</>}
@@ -396,23 +419,23 @@ export default function PanelSdn({ live }) {
           {live || engine === "local" ? <><label className="field-label sdn-spaced" htmlFor="sdn-policy">CRITERIO DE LA RUTA</label><select id="sdn-policy" className="select-control" value={policy} onChange={(event) => { clearRoute(); setPolicy(event.target.value); }}>{Object.entries(live ? ROUTE_POLICIES : POLICIES).map(([key, value]) => <option key={key} value={key} disabled={key === "delay" && !hasDelay}>{value.label}{key === "delay" && !hasDelay ? " · falta configuración" : ""}</option>)}</select><p className="sdn-muted">{ROUTE_POLICIES[policy].description}</p></> : <p className="sdn-muted">Usa el endpoint convencional de tu interfaz original. El criterio y el costo los determina el backend.</p>}
           <div className="sdn-endpoints"><div><label className="field-label" htmlFor="sdn-origin">ORIGEN</label><select id="sdn-origin" className="select-control" value={origin} onChange={(event) => { clearRoute(); setOrigin(event.target.value); }}>{topology.nodes.map((n) => <option key={n.id} value={n.id}>{n.label}</option>)}</select></div><ArrowRight size={18} /><div><label className="field-label" htmlFor="sdn-destination">DESTINO</label><select id="sdn-destination" className="select-control" value={destination} onChange={(event) => { clearRoute(); setDestination(event.target.value); }}>{topology.nodes.map((n) => <option key={n.id} value={n.id}>{n.label}</option>)}</select></div></div>
           <button className="primary-button" disabled={routeLoading || !origin || origin === destination || (live && !live.ready)}><Route size={17} />{routeLoading ? "Calculando…" : policy === "ml" ? "Calcular ruta inteligente" : "Calcular ruta"}</button>{origin === destination && <p className="sdn-muted">Elige origen y destino distintos.</p>}
-        </form><div aria-live="polite">{intelligentExpired && <p className="error-message" role="status">La ruta inteligente ha caducado. Calcula de nuevo para usar predicciones recientes.</p>}{routeError && <div className="error-message" role="alert"><AlertCircle size={17} />{routeError}</div>}{routeResult ? <div className="route-result"><div className="result-heading"><CheckCircle2 size={17} />{routeResult.policy === "ml" ? "Ruta inteligente calculada" : "Ruta calculada"} · {routeResult.engine === "live" ? "red activa en FastAPI" : "panel local"}</div><div className="route-nodes">{routeResult.path.map((id, i) => <span className="route-node-item" key={id}>{i > 0 && <ArrowRight size={13} />}<strong>{labels.get(id)}</strong></span>)}</div><div className="cost-row"><span>Costo {ROUTE_POLICIES[routeResult.policy] ? `(${ROUTE_POLICIES[routeResult.policy].unit})` : "informado por la API"}</span><strong>{format(routeResult.cost, 6)}</strong></div><dl className="sdn-details sdn-route-details"><Detail label="Saltos">{format(routeResult.hops, 0)}</Detail><Detail label="Capacidad mínima nominal">{format(routeResult.capacity)} Mbps</Detail><Detail label="Suma de retardos configurados">{routeResult.configuredDelay === null ? "No disponible" : `${format(routeResult.configuredDelay)} ms`}</Detail>{routeResult.policy === "ml" && <>
+        </form><div aria-live="polite">{routeError && <div className="error-message" role="alert"><AlertCircle size={17} />{routeError}</div>}{routeResult ? <div className="route-result"><div className="result-heading"><CheckCircle2 size={17} />{routeResult.policy === "ml" ? "Ruta inteligente calculada" : "Ruta calculada"} · {routeResult.engine === "live" ? "red activa en FastAPI" : "panel local"}</div><div className="route-nodes">{routeResult.path.map((id, i) => <span className="route-node-item" key={id}>{i > 0 && <ArrowRight size={13} />}<strong>{labels.get(id)}</strong></span>)}</div><div className="cost-row"><span>Costo {ROUTE_POLICIES[routeResult.policy] ? `(${ROUTE_POLICIES[routeResult.policy].unit})` : "informado por la API"}</span><strong>{format(routeResult.cost, 6)}</strong></div><dl className="sdn-details sdn-route-details"><Detail label="Saltos">{format(routeResult.hops, 0)}</Detail><Detail label="Capacidad mínima nominal">{format(routeResult.capacity)} Mbps</Detail><Detail label="Suma de retardos configurados">{routeResult.configuredDelay === null ? "No disponible" : `${format(routeResult.configuredDelay)} ms`}</Detail>{routeResult.policy === "ml" && <>
             <Detail label="Delay previsto acumulado">{format(routeResult.metrics.delay_previsto_ms)} ms</Detail>
             <Detail label="Loss previsto compuesto">{format(routeResult.metrics.loss_previsto_ratio * 100)} %</Detail>
             <Detail label="Costo de referencia (Σ 1/Mbps)">{format(routeResult.metrics.costo_referencia, 6)}</Detail>
           </>}
           </dl>{routeResult.policy === "ml" && <>
-            <p className="sdn-muted">Modelo: {routeResult.ml.modelo_id}. Ventana usada: {new Date(routeResult.ml.feature_start_epoch_s * 1000).toLocaleTimeString("es-CO")} → {new Date(routeResult.ml.feature_end_epoch_s * 1000).toLocaleTimeString("es-CO")}. Antigüedad: {format(clock / 1000 - routeResult.ml.feature_end_epoch_s, 0)} s / {routeResult.ml.max_age_s} s.</p>
+            <p className="sdn-muted">Modelo: {routeResult.ml.modelo_id}. Ventana usada: {new Date(routeResult.ml.feature_start_epoch_s * 1000).toLocaleTimeString("es-CO")} → {new Date(routeResult.ml.feature_end_epoch_s * 1000).toLocaleTimeString("es-CO")}. Resultado guardado de esa ventana; no se actualiza automáticamente.</p>
             <details><summary>Predicciones de los enlaces de esta ruta</summary><div className="sdn-table-scroll"><table className="sdn-table"><caption>Predicciones fijadas a la ventana usada para esta ruta</caption><thead><tr><th>Dirección</th><th>RX Mbps</th><th>Delay ms</th><th>Loss %</th></tr></thead><tbody>
               {routeResult.metrics.predicciones_enlaces.map(e => <tr key={e.link_id}><td><button type="button" className="sdn-table-link" onClick={() => { setSelected({ type: "link", id: e.link_id }); document.getElementById("details")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>{labels.get(e.origen)} → {labels.get(e.destino)}</button></td><td>{format(e.throughput_rx_mbps)}</td><td>{format(e.delay_ms)}</td><td>{format(e.loss_ratio * 100)}</td></tr>)}
             </tbody></table></div></details>
             <details><summary>Método y pesos utilizados</summary><p className="sdn-muted">Delay {format(routeResult.weights.delay)} · Loss {format(routeResult.weights.loss)} · Capacidad {format(routeResult.weights.capacity)} · Carga RX {format(routeResult.weights.load)}. Escalas: {format(routeResult.scales.delay_ms)} ms, {format(routeResult.scales.loss_ratio * 100)} % y {format(routeResult.scales.capacity_mbps)} Mbps. Puedes configurar los pesos en Comparar rutas.</p>{routeResult.warnings.map(text => <p className="sdn-muted" key={text}>{text}</p>)}</details>
           </>}
           <p className="sdn-muted">Ruta calculada sobre los enlaces disponibles de la red verificada. Las cifras nominales de la ruta no sustituyen las mediciones extremo a extremo.</p><button className="clear-button" onClick={clearRoute}>Limpiar ruta</button></div> : !routeError && <div className="sdn-route-placeholder"><Route size={32} /><strong>Elige el trayecto que quieres explorar</strong><p>{policy === "ml" ? "La ruta inteligente aparecerá en violeta discontinuo en el mapa." : "La ruta aparecerá resaltada en verde en el mapa."}</p><span>La telemetría se muestra cuando hay una ventana reciente.</span></div>}</div></div>
-          {comparisonExpired && <p className="error-message" role="status">La comparacion ML ha caducado. Pulsa Comparar rutas para usar una ventana reciente.</p>}
-          {live && <ComparacionRutas key={JSON.stringify([apiUrl, live.instanceId, live.graphVersion, live.snapshot.selection_revision, live.ready, origin, destination])} live={live} apiUrl={apiUrl} origin={origin} destination={destination} clock={clock} labels={labels}
-            result={comparison} onResult={setComparison} visibility={visibility} onVisibility={setVisibility} onStart={clearRoute}
+          {live && <ComparacionRutas key={JSON.stringify([apiUrl, live.instanceId, live.graphVersion, live.snapshot.selection_revision, live.ready, origin, destination])} live={live} apiUrl={apiUrl} origin={origin} destination={destination} labels={labels}
+            result={comparison} onResult={setComparison} visibility={visibility} onVisibility={setVisibility} onStart={clearIndividualRoute}
             onSelectLink={id => { setSelected({ type: "link", id }); document.getElementById("details")?.scrollIntoView({ behavior: "smooth", block: "start" }); }} />}
+          <details className="sdn-evaluation-details"><summary>Evaluación de los cuatro modelos · MSE, RMSE y MAE</summary><ModelosMl apiUrl={apiUrl} topologia={topology.id} /></details>
         </section>
 
         <section className="panel sdn-links-panel" id="links"><PanelHeading icon={Gauge} title="Inventario de enlaces" caption={`${filteredLinks.length} de ${topology.links.length} enlaces · valores de configuración`} /><label className="field-label" htmlFor="sdn-search">BUSCAR POR NODO O ENLACE</label><input id="sdn-search" type="search" className="select-control sdn-search" placeholder="Buscar por nodo, enlace o ciudad" value={search} onChange={(event) => setSearch(event.target.value)} /><div className="sdn-table-scroll"><table className="sdn-table"><caption className="sdn-sr-only">Enlaces de {topology.name}. Selecciona un enlace para ver su configuración y el estado de sus mediciones.</caption><thead><tr><th scope="col">Enlace</th><th scope="col">Estado</th><th scope="col">Puertos</th><th scope="col">Capacidad nominal</th><th scope="col">Retardo configurado</th><th scope="col">Cola máxima</th></tr></thead><tbody>{filteredLinks.map((e) => <tr key={e.id} className={selected?.type === "link" && selected.id === e.id ? "sdn-selected-row" : ""}><td><button className="sdn-table-link" onClick={() => { setSelected({ type: "link", id: e.id }); document.getElementById("details")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>{labels.get(e.source)} ↔ {labels.get(e.target)}</button></td><td>{live?.ready ? (live.edgeStates.get(e.id)?.state === "up" ? "Activo" : "No disponible") : "Sin verificar"}</td><td>{format(e.portU, 0)} / {format(e.portV, 0)}</td><td>{format(e.capacity)} Mbps</td><td>{e.delay === null ? "—" : `${format(e.delay)} ms`}</td><td>{e.queue === null ? "—" : `${format(e.queue, 0)} paquetes`}</td></tr>)}</tbody></table>{!filteredLinks.length && <p className="sdn-muted">No hay enlaces que coincidan con la búsqueda.</p>}</div><p className="sdn-muted">Fuente: {topology.source}. {topology.configurationSource}</p></section>

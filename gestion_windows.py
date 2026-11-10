@@ -211,6 +211,8 @@ class Gestor:
                 return False
             if salud.get("criterios_comparacion") != ["hops", "delay", "capacity", "ml"]:
                 return False
+            if salud.get("comparacion_modelos_version") != 1:
+                return False
             with cliente.open("http://127.0.0.1:8003/sdn-selector.html", timeout=1.5) as respuesta:
                 pagina = respuesta.read(131072).decode("utf-8")
             return 'id="root"' in pagina and "SDN / KDN" in pagina

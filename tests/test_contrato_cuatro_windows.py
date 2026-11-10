@@ -17,6 +17,7 @@ class ContractTests(unittest.TestCase):
         result = {'estado': 'ok', 'servicio': 'SDN/KDN Windows Rutas ML', 'version': '1.0.0'}
         if criteria is not None:
             result['criterios_comparacion'] = criteria
+            result['comparacion_modelos_version'] = 1
         return result
 
     def check_health(self, value):

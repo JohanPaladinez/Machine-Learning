@@ -79,7 +79,7 @@ class LiveNetwork:
         except Exception as error:
             result.update(status="mininet_unreachable", message="No se puede leer Mininet: " + str(error))
             return result
-        for key in ("observed_utc", "capture", "candidates", "errors", "session_id", "source_kind", "topologia", "topology_document", "topology_instance_id", "metrics", "controller", "links_runtime"):
+        for key in ("observed_utc", "capture", "candidates", "errors", "session_id", "source_kind", "topologia", "topology_document", "topology_instance_id", "metrics", "controller", "links_runtime", "hosts_runtime", "protocol_configured", "console"):
             if key in observed:
                 result[key] = observed[key]
         if observed.get("status") != "observed":

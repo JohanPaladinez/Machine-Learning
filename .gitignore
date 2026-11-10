@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+!frontend/app/.env.production
 *.pem
 *.key
 id_rsa*
@@ -33,3 +34,14 @@ work/
 .ejecucion_windows/
 entorno-windows.json
 VALIDACION_WINDOWS.json
+
+# Resultados locales del entrenamiento y servicios, no codigo fuente
+comparacion_cuatro_ml_*/
+servicio_cuatro_modelos_*/
+consola_geant2_*/
+consola_nsfnet_*/
+en_vivo_*/
+nocturna_*/
+*.rar
+*.zip
+tests/SINTETICO_PRUEBA_MODELOS.json

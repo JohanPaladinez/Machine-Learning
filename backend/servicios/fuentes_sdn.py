@@ -83,8 +83,9 @@ class MultiNetwork(LiveNetwork):
             name = self.auto_name if self.selected_topologia == 'auto' else self.selected_topologia
             base = self.sources[name]['ryu_rest_url']
             suffix = url.removeprefix(base)
+            import re
             if not (url.startswith(base + '/stats/') and
-                    (suffix == '/stats/switches' or suffix.startswith('/stats/portdesc/'))):
+                    (suffix == '/stats/switches' or re.fullmatch(r'/stats/(?:portdesc|port|desc)/[0-9]+', suffix))):
                 raise ValueError('Consulta fuera del controlador configurado')
             return self.fetch(url)
         name = self.auto_name if self.selected_topologia == 'auto' else self.selected_topologia

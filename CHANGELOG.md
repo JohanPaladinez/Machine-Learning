@@ -1,5 +1,15 @@
 # Cambios
 
+## Actualizacion — 2026-11-10
+
+- Comparacion de cinco rutas: convencional y una por cada modelo polinomial, Decision Tree, Random Forest y XGBoost.
+- Entrenamiento, evaluacion y servicio aislado de los cuatro regresores en RYU; inferencia adicional en 8011 y conservacion de 8010.
+- Informes de validacion/test descriptivo, proyeccion fisica declarada de las nuevas inferencias y comparaciones guardadas para la sustentacion.
+- Hosts, enlaces de acceso y controlador visibles en el mapa; inspectores de switches, puertos y metricas de enlace ampliados.
+- Consolas Mininet interactivas simultaneas; correccion v1.1 de reserva TCP y cierre de observador no iniciado. El usuario confirmo el arranque de ambas consolas.
+- Documentacion actualizada, pruebas portables y comprobaciones sinteticas de CI. Datos y pesos entrenados permanecen fuera de Git.
+- La aplicacion de rutas de la GUI al trafico real se deja pendiente expresamente; no se presenta como implementada.
+
 ## 1.1.1 — Entrega Windows del 2026-11-09
 
 - Interfaz nativa Windows con FastAPI y panel en el puerto 8003.

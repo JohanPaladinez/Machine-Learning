@@ -17,10 +17,13 @@ def crear_app(raiz):
     from backend.api import sdn_selector_v2 as selector
     from backend.servicios.comparacion_rutas import CRITERIA
     aplicacion = selector.original.original_app
+    from backend.api.sdn_cinco_modelos import router as cinco_router
+    aplicacion.include_router(cinco_router)
 
     @aplicacion.get("/api/windows/salud")
     def salud_windows():
-        return {"estado": "ok", "servicio": "SDN/KDN Windows Rutas ML", "version": "1.1.1",
+        return {"estado": "ok", "servicio": "SDN/KDN Windows Rutas ML", "version": "1.2.0",
+                "comparacion_modelos_version": 1,
                 "criterios_comparacion": list(CRITERIA)}
 
     aplicacion.mount("/", StaticFiles(directory=str(raiz / "frontend/app/dist-sdn-selector-v2"), html=True), name="panel_windows")

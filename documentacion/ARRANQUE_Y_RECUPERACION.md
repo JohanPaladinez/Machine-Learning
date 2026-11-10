@@ -1,3 +1,5 @@
+> Documento de una version anterior. Para el estado actual (Windows, cinco rutas y consolas interactivas), consultar README.md y documentacion/ESTADO_ACTUAL.md. Se conserva como historial.
+
 # Arranque y recuperación de las tres VMs
 
 ## 1. Consultar antes de iniciar

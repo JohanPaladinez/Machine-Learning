@@ -1,0 +1,16 @@
+{
+  "archivos_sha256": {
+    "comparar_modelos_sdn.py": "a0982181416bf593295e409e95d1a22ed258afc8c994ba8aad961312ea38d380",
+    "entrenar_modelo_comun_sdn.py": "2dd578c00c94d0b816f369a50647f2ebfeb5626ccccd4afa5c88f061544f1235",
+    "iniciar_comparacion_ryu.sh": "968f195fa831d66575597b221739487c28674bbc59e9589bebb7814f64025c82",
+    "LEEME.md": "b5c02981ceba90fea7c0f64629f2b12c90ee401d9faff78bdb0fac252bab5078",
+    "requirements-ryu-py36.txt": "2da0ba3b503974233ef041b5fb322e74f271df7087483aa46fbb13b22f6bbf8c"
+  },
+  "pruebas_locales": "Circuito sintetico de cuatro modelos y protecciones. El usuario aporto resultados de entrenamiento/evaluacion en RYU; ver documentacion/ESTADO_ACTUAL.md.",
+  "esquema": {
+    "features": 60,
+    "targets": 6
+  },
+  "modelo_en_servicio_modificado": false,
+  "estado_publicacion": "Codigo de la version actual; ver documentacion/ESTADO_ACTUAL.md para evidencia de ejecucion."
+}

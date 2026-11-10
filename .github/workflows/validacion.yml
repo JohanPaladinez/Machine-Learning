@@ -26,6 +26,41 @@ jobs:
       - name: Preparar entorno aislado
         run: python -m pip install -r requirements-ci.txt
       - name: Ejecutar pruebas sin contactar las VMs
-        run: python -m pytest tests -q
+        run: python -m pytest tests -q --ignore=tests/ml
       - name: Comprobar sintaxis de servicios y recuperacion
-        run: python -m compileall -q backend scripts laboratorio
+        run: python -m compileall -q backend scripts laboratorio consolas_mininet_v1 comparacion_ml_sdn rutas_cinco_modelos_ryu
+
+  pruebas-javascript:
+    name: Pruebas de presentacion
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/app/package-lock.json
+      - run: node --test tests/*.mjs
+      - run: npm ci --no-audit --no-fund
+        working-directory: frontend/app
+      - run: npm run build -- --config vite.sdn-selector.config.js
+        working-directory: frontend/app
+
+  pruebas-ml-sinteticas:
+    name: Circuito ML sintetico aislado
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-ci-ml.txt
+      - run: python -m pip install -r requirements-ci-ml.txt
+      - run: python -m pytest tests/ml -q

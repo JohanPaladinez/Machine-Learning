@@ -1,88 +1,107 @@
 # Machine Learning — SDN/KDN
 
-Proyecto de visualización y comparación de rutas sobre NSFNET y GEANT2, con RYU y Mininet en máquinas virtuales y la interfaz ejecutándose directamente en Windows.
+Laboratorio de visualizacion, telemetria y comparacion de rutas sobre **NSFNET y GEANT2**. El panel y FastAPI funcionan en Windows; Mininet y RYU permanecen en sus VMs. Se admiten ambas topologias simultaneas.
 
-## Versión actual
+## Estado actual — 10 de noviembre de 2026
 
-- Selección de NSFNET o GEANT2 y verificación de la red observada en Mininet/Ryu.
-- Mapas geográficos y esquemas de red, con ciudades de referencia e inspección de nodos y enlaces.
-- Cuatro criterios: menor número de saltos, menor retardo configurado, inverso de capacidad nominal y ruta con métricas previstas por ML.
-- Las cuatro tarjetas y la tabla presentan los mismos siete indicadores: saltos, retardo configurado, inverso de capacidad, QoS previsto, delay previsto, pérdida prevista y capacidad mínima nominal.
-- Colores por criterio, enlaces compartidos, caminos coincidentes y controles para aislar trazados.
-- Predicciones por enlace de la siguiente ventana, con comprobación de identidad, entradas completas y antigüedad máxima de 120 segundos.
+- **Cinco alternativas de ruta:** Dijkstra convencional (suma de 1/capacidad nominal) y Dijkstra con pesos derivados de cada modelo: polinomial, Decision Tree, Random Forest y XGBoost.
+- Las cinco rutas presentan los mismos siete indicadores: saltos, retardo configurado, costo inverso de capacidad, QoS observado, suma de delay medido, perdida medida compuesta y capacidad minima nominal. Las previsiones de cada modelo se muestran por separado.
+- Comparacion de modelos con MSE, RMSE, MAE, R² y conteo de predicciones fuera de rango. XGBoost fue seleccionado usando validacion; el test posterior se presenta como descriptivo porque ya se habia examinado.
+- Resultados completos guardados en el navegador para la sustentacion, conservando fecha, ventana e identidad. Un resultado guardado no se presenta como una medicion actual. Las solicitudes de inferencia nuevas siguen exigiendo entradas recientes.
+- Mapas geograficos y esquemas con switches, hosts, enlaces de acceso y controlador RYU. Las conexiones de control se distinguen de los enlaces de datos y no participan en Dijkstra.
+- Inspector operativo: fabricante, plataforma y version reportados por RYU; puertos, estado, bits y paquetes TX/RX, descartes, errores y tasas. Los datos ausentes se indican, nunca se reemplazan por cero.
+- Ventanas nuevas de enlace con delay promedio/minimo/maximo de sondas, throughput TX/RX, bits, paquetes y sondas no recibidas. Perdida ofrecida, rechazos locales y descartes de puerto/cola se identifican por separado.
+- **Dos consolas Mininet reales**, una por red, con `nodes`, `links`, `ports`, `pingall` y `telemetria`. Los recolectores miden esas mismas redes mientras se usan las consolas.
 
-La comparación calcula caminos; no instala reglas ni demuestra una mejora de rendimiento del tráfico real. Las métricas previstas se distinguen de las medidas y de los valores configurados. Las ciudades son ubicaciones reales asignadas como referencias visuales del laboratorio: su asociación con s1…sN no es una identificación histórica verificada. Los IDs y conexiones originales se conservan.
+**Pendiente deliberado:** aplicar desde la GUI la ruta seleccionada al trafico real y demostrar su recorrido. Los botones actuales calculan y dibujan alternativas; no instalan sus reglas. Las redes conservan el forwarding de arranque de sus recolectores para permitir comunicacion. No se afirma una mejora extremo a extremo a partir de las estimaciones de enlaces.
 
-## Ejecutar en Windows
+Las ciudades son referencias visuales reales del laboratorio; la correspondencia historica de cada ciudad con s1…sN no ha sido verificada. Se conservan IDs y conexiones.
 
-Requisitos: Python 3.10 o posterior y Node.js compatible con Vite 8 (22.12 o posterior; también se admite la rama 20 desde 20.19). Git es necesario para clonar.
+## Ejecutar la interfaz en Windows
 
-Después de clonar, abre PowerShell en esta carpeta y ejecuta:
+Requisitos: Python 3.10 o posterior y Node.js compatible con Vite 8. El instalador comprueba las versiones. Desde PowerShell en la raiz del clon:
 
 ```powershell
 python instalar_windows.py
 .\Abrir_interfaz.cmd
 ```
 
-El instalador crea un entorno Python propio, instala las dependencias y compila la interfaz. El panel y FastAPI comparten [http://127.0.0.1:8003/sdn-selector.html](http://127.0.0.1:8003/sdn-selector.html). No es necesario arrancar Vite por separado ni usar una tercera VM de interfaz.
+El instalador crea `.venv`, instala dependencias y compila React. El panel y FastAPI comparten [http://127.0.0.1:8003/sdn-selector.html](http://127.0.0.1:8003/sdn-selector.html). No hace falta una tercera VM ni ejecutar Vite por separado.
 
-Para detener solo esta aplicación:
+Para cargar cambios del backend, ejecutar `Detener_interfaz.cmd` y despues `Abrir_interfaz.cmd`; recargar el navegador con Ctrl+F5. Los `.cmd` se ejecutan con doble clic o como archivos: no se pega su contenido en PowerShell. La guia ampliada esta en [LEEME_WINDOWS.md](LEEME_WINDOWS.md).
 
-```powershell
-.\Detener_interfaz.cmd
+## Consolas interactivas de Mininet
+
+Mantener RYU y sus servicios disponibles. Desde Windows, ejecutar **Instalar_consolas_Mininet.cmd**. Copia los dos lanzadores y abre dos ventanas SSH; cada una pide las credenciales de Mininet y sudo. Se esperan los prompts:
+
+```text
+mininet-geant2>
+mininet-nsfnet>
 ```
 
-Los archivos `.cmd` se ejecutan: no hay que copiar su contenido dentro de PowerShell. Las VMs y sus servicios se mantienen por separado. La guía ampliada está en [LEEME_WINDOWS.md](LEEME_WINDOWS.md).
+En cada consola se pueden ejecutar `nodes`, `links`, `net`, `ports`, `pingall` y `telemetria`. GEANT2 usa switches nc/hosts nh; NSFNET usa ns/nsh para evitar colisiones. `exit` o cerrar SSH detiene solo la red de esa terminal. Mantener las dos abiertas.
 
-## Conexiones del laboratorio
+La version 1.1 reserva el observador con reutilizacion de direccion TCP, sin compartir un listener activo, antes de crear Mininet. El usuario confirmo el funcionamiento de ambas consolas tras esta correccion. Los resultados concretos de `pingall` y la demostracion de rutas reales siguen siendo comprobaciones independientes.
 
-Edita `configuracion_windows.json` si las direcciones de tus VMs son diferentes y reinicia la aplicación Windows.
+El lanzador **requiere las carpetas instrumentadas y configuraciones existentes en la VM**. Identifica su propietario, conserva una copia de sus fuentes y reemplaza limpiamente solo esa sesion. No ejecuta una limpieza global ni borra modelos o datasets. Consultar [la guia de consolas](consolas_mininet_v1/LEEME.md).
 
-| Servicio | Configuración del laboratorio |
+## Servicios del laboratorio
+
+Editar `configuracion_windows.json` si cambian las direcciones. Son direcciones privadas de ejemplo del laboratorio, no credenciales.
+
+| Servicio | Direccion / puerto |
 |---|---|
 | Observador NSFNET / Mininet | http://192.168.56.107:8769 |
 | Observador GEANT2 / Mininet | http://192.168.56.107:8768 |
-| RYU REST NSFNET | http://192.168.56.108:18081 |
-| RYU REST GEANT2 | http://192.168.56.108:18080 |
-| Inferencia del modelo común / RYU | http://192.168.56.108:8010 |
+| RYU REST NSFNET / OpenFlow | http://192.168.56.108:18081 / 16654 |
+| RYU REST GEANT2 / OpenFlow | http://192.168.56.108:18080 / 16653 |
+| Modelo individual del inspector | http://192.168.56.108:8010 |
+| Servicio de cuatro modelos | http://192.168.56.108:8011 |
 
-Puertos OpenFlow: NSFNET 16654; GEANT2 16653. Encender las VMs no garantiza que sus controladores, observadores y servicio de inferencia estén en ejecución. La interfaz necesita acceso HTTP a esos servicios.
+El inspector y la ruta ML individual conservan el servicio 8010. **Comparar las 5 rutas** usa 8011. OpenFlow 1.3 esta configurado al crear los switches; el inspector no inventa la version negociada si REST no la publica. Encender las VMs no implica iniciar automaticamente sus servicios.
 
-## Dataset y modelo
+## Dataset, entrenamiento y modelos
 
-Se completó un dataset consolidado de **20 horas totales entre ambas topologías**, con procedencia diferenciada y campo `topologia`. El modelo común utiliza 60 entradas y seis salidas direccionales: throughput RX, delay y pérdida en ambos sentidos. El entrenamiento y la evaluación final ya se realizaron en RYU.
+Un unico dataset consolidado contiene **20,0155 horas documentadas totales entre las dos topologias**, con campo `topologia` y procedencia diferenciada. El esquema usa 60 entradas y seis objetivos: throughput RX, delay y perdida en ambos sentidos.
 
-Los archivos originales permanecen en RYU y **no están incluidos en este repositorio**:
+- [Comparacion y entrenamiento de cuatro modelos](comparacion_ml_sdn/LEEME.md): entorno RYU aislado, protocolo y validacion. No repetir el entrenamiento ya completado para abrir el panel.
+- [Servicio de inferencia de cuatro modelos](rutas_cinco_modelos_ryu/LEEME.md): verifica hashes y conserva el servicio anterior.
+- [Estado, metodologia y limites](documentacion/ESTADO_ACTUAL.md).
+
+Los datos y pesos entrenados permanecen en RYU y **no se publican como parte del codigo**:
 
 - Dataset: `/home/ryu/proyecto_nsfnet/datos/nocturna_c064e9fb0ad2_win4e5zw/dataset_consolidado_20h.csv`.
-- Modelo: `/home/ryu/proyecto_nsfnet/resultados_comun_20261107T205101/modelo_20261107T205202Z_n4vncu_0/modelo_comun.pkl`.
-- Evaluación guardada: `evaluacion_test.json` junto al modelo.
+- Modelo individual: `/home/ryu/proyecto_nsfnet/resultados_comun_20261107T205101/modelo_20261107T205202Z_n4vncu_0/modelo_comun.pkl`, junto a su `evaluacion_test.json`.
+- Comparacion de cuatro modelos: el archivo `~/proyecto_nsfnet/comparacion_ml_sdn/ultima_comparacion.txt` apunta al trabajo; su registro identifica `CARPETA_COMPARACION`.
 
-Clonar este código no reconstruye por sí solo esos artefactos ni el contenido completo de las VMs. El panel consume el servicio de inferencia existente; no reentrena ni necesita copiar el modelo a Windows. La pérdida de las sesiones instrumentadas incluye rechazos locales de sondas y el throughput RX no equivale a ancho de banda disponible.
+Clonar no reconstruye esos artefactos ni equivale a copiar las VMs. Los informes reales de evaluacion pueden cargarse desde RYU en la GUI; los archivos de pruebas del repositorio son sinteticos. La perdida ofrecida incluye rechazos locales. El throughput RX y la capacidad residual estimada no demuestran ancho de banda disponible.
 
-## Organización
+El ajuste manual de relojes se conserva en `Alinear_relojes_VMs.cmd`, como herramienta opcional bajo accion expresa del usuario. No se ejecuta al iniciar el panel o las redes y no configura NTP. Las comparaciones guardadas no necesitan repetir ese ajuste para seguir visibles.
 
-- `frontend/app/`: React, Cytoscape, mapas y comparación.
-- `backend/`: FastAPI, cálculo de rutas, verificación de fuentes e integración ML.
-- Lanzadores y `requirements-windows.txt`: ejecución nativa en Windows.
-- `laboratorio/`: copias de recuperación de scripts y perfiles RYU/Mininet procedentes de la entrega anterior. No constituyen una copia recién extraída de las VMs actuales.
-- `tests/`: pruebas sintéticas y comprobaciones explícitas del laboratorio.
-- `documentacion/` y `evidencias/`: arquitectura, cambios e historial. Las guías de puertos 5181/5182 y de la tercera VM describen versiones anteriores; para esta versión utiliza esta guía y LEEME_WINDOWS.
+## Organizacion
 
-Los entornos, dependencias instaladas, registros de ejecución, respaldos, CSV, modelos y credenciales se excluyen mediante `.gitignore`.
+- `backend/`, `frontend/app/`: API, calculos, inspectores y panel actual.
+- `consolas_mininet_v1/`, `Instalar_consolas_Mininet.cmd`: consolas reales y telemetria.
+- `comparacion_ml_sdn/`: scripts del experimento de cuatro regresores y dependencias RYU Python 3.6.
+- `rutas_cinco_modelos_ryu/`: inferencia adicional del puerto 8011.
+- `laboratorio/`: fuentes de recuperacion de la entrega anterior; no son una extraccion nueva de las VMs actuales. Su documentacion se conserva como historial.
+- `tests/`: pruebas sinteticas; `tests/ml/` contiene el circuito de entrenamiento de prueba.
+- `documentacion/`, `evidencias/`: estado actual, limitaciones, historial y captura del mapa.
 
-## Comprobaciones
+## Comprobar el codigo sin contactar las VMs
+
+En un entorno de pruebas aislado, distinto de `entorno_ml` de RYU:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-ci.txt
-.\.venv\Scripts\python.exe -m pytest tests -q
-node --test tests/test_geografia_cuatro.mjs tests/test_contrato_cuatro_frontend.mjs
+python -m pip install -r requirements-ci.txt
+python -m pytest tests -q --ignore=tests/ml
+node --test tests/*.mjs
 ```
 
-Estas pruebas sintéticas no necesitan las VMs. La compilación se realiza con `python instalar_windows.py`. El script `tests/validar_en_vivo.py` es una comprobación separada que consulta redes reales y puede cambiar la selección del backend probado; no forma parte del arranque habitual.
+El circuito sintetico de entrenamiento usa otro entorno de Python 3.12 o posterior con `requirements-ci-ml.txt` y se ejecuta con `python -m pytest tests/ml -q`. Las versiones modernas de CI no sustituyen las versiones fijadas en `comparacion_ml_sdn/requirements-ryu-py36.txt` para la VM antigua. Las comprobaciones reales de trafico se realizan separadamente; no se entrenan modelos ni se contactan las VMs durante las pruebas sinteticas.
 
 ## Procedencia
 
-Basado en [Sergio777gg/sdn-kdn-rutas-ml](https://github.com/Sergio777gg/sdn-kdn-rutas-ml), commit `aeab8d50f7de505672b3940c9905ed9ee5929194`, con adaptación Windows, cuatro criterios, métricas comunes y mapas añadidos en esta entrega.
+Basado en [Sergio777gg/sdn-kdn-rutas-ml](https://github.com/Sergio777gg/sdn-kdn-rutas-ml), commit `aeab8d50f7de505672b3940c9905ed9ee5929194`, con los cambios de este laboratorio. Cartografia de [Natural Earth](https://www.naturalearthdata.com/about/terms-of-use/) y referencia de grafos numerados de [BNN-UPC](https://github.com/BNN-UPC/DRL-ES-OTN/tree/main/dataset_Topologies). Se mantiene la atribucion y no se añade una licencia general sin decision de los autores.
 
-Cartografía incluida localmente: [Natural Earth, dominio público](https://www.naturalearthdata.com/about/terms-of-use/). Referencia de grafos numerados: [BNN-UPC](https://github.com/BNN-UPC/DRL-ES-OTN/tree/main/dataset_Topologies). Se conserva la documentación de procedencia; no se añade una licencia general al código sin decisión de sus autores.
+Entornos, dependencias instaladas, datos, pesos entrenados, respaldos, sesiones y credenciales quedan excluidos mediante `.gitignore`.

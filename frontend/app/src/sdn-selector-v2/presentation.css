@@ -63,3 +63,27 @@
   .sdn-panel-v1 .sdn-geography-stage.is-geographic .topology-canvas { height:430px; }
   .sdn-panel-v1 .sdn-geography-stage.region-europe .topology-canvas { height:610px; }
 }
+
+.sdn-models-panel { margin:18px 0; scroll-margin-top:20px; }
+.sdn-models-panel .panel-title h2 { margin:0; font-size:17px; }
+.sdn-ml-actions,.sdn-ml-tabs { display:flex; flex-wrap:wrap; gap:10px; margin:18px 0; }
+.sdn-ml-tabs button { border:1px solid #2c4962; border-radius:8px; padding:10px 15px; background:#0d1c2c; color:#9bb4cb; cursor:pointer; font-size:12px; }
+.sdn-ml-tabs button[aria-pressed="true"] { color:#c3eeff; background:#123952; border-color:#38bdf8; }
+.sdn-ml-empty { display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center; color:#9ab5cd; border:1px dashed #365069; border-radius:10px; padding:35px 22px; margin:18px 0; }
+.sdn-ml-empty p { font-size:12px; line-height:1.8; max-width:630px; margin:0; }
+.sdn-ml-filters { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; margin:20px 0; }
+.sdn-ml-filters label { color:#98b5ce; font-size:10px; letter-spacing:.6px; }
+.sdn-ml-filters select { margin-top:8px; }
+.sdn-ml-selected { display:inline-block; font-size:10px; color:#93e0c6; background:#12342e; border:1px solid #2e6454; border-radius:5px; padding:7px 9px; }
+.sdn-ml-route-service { border-top:1px solid #2b455d; margin-top:26px; padding-top:18px; }
+.sdn-ml-route-service h3 { color:#bcd2e5; font-size:13px; }
+.sdn-ml-route-service .sdn-pending-note { margin-top:12px; }
+@media(max-width:760px) { .sdn-ml-filters { grid-template-columns:1fr; } }
+
+.sdn-evaluation-details { margin-top:24px; border:1px solid #2b455d; border-radius:9px; padding:15px; }
+.sdn-evaluation-details > summary { color:#bcd2e5; cursor:pointer; font-size:13px; line-height:1.7; }
+.sdn-models-panel h5 { color:#bcd2e5; }
+
+.sdn-saved-comparison { border:1px solid #315a73; border-radius:9px; background:#102c40; padding:15px; margin:17px 0; color:#a9cce3; font-size:11px; line-height:1.8; }
+.sdn-saved-comparison strong { color:#d5edfa; font-size:12px; }
+.sdn-saved-comparison p { margin:6px 0 0; }

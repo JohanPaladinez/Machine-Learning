@@ -1,3 +1,5 @@
+> Documento de una version anterior. Para el estado actual (Windows, cinco rutas y consolas interactivas), consultar README.md y documentacion/ESTADO_ACTUAL.md. Se conserva como historial.
+
 # Mininet, RYU y la interfaz conectados
 
 Esta ampliación conserva el código anterior y prepara un panel que consulta la sesión real de Mininet y verifica sus interfaces contra los puertos OpenFlow de RYU. Los archivos están preparados aquí; la instalación y la comprobación entre tus VMs se hacen ejecutando los dos instaladores.

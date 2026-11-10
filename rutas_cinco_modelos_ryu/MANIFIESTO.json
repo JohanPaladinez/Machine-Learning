@@ -1,0 +1,12 @@
+{
+  "sha256": {
+    "iniciar_servicio_modelos.sh": "5ab255bb04aceb77b483f4dc3e7981fc767b226f4b6d6243afaf295166d3b2b9",
+    "LEEME.md": "2d32c7bbb51a481a62a79f78742a8562b1af8752eaec7cf327a811fec14466a9",
+    "servidor_cuatro_modelos.py": "bd87ad025002607cf3b3bf0f35aa809788a18c65cd9faf3bf0ce03d497e26f75"
+  },
+  "pruebas_nuevas_backend": 10,
+  "pruebas_presentacion": 4,
+  "regresiones": 23,
+  "redes_reales_cinco_rutas_verificadas": false,
+  "estado_publicacion": "Codigo de la version actual; ver documentacion/ESTADO_ACTUAL.md para evidencia de ejecucion."
+}

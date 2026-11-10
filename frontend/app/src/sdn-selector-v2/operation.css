@@ -1,0 +1,11 @@
+.sdn-operational { margin-top: 22px; padding-top: 15px; border-top: 1px solid #28445e; min-width: 0; }
+.sdn-operational h4 { font-size: 12px; color: #bed9ed; margin: 15px 0 7px; }
+.sdn-port-table td strong { font-size: 11px; }
+.sdn-port-table { font-variant-numeric: tabular-nums; }
+.sdn-infrastructure-controls { display: flex; flex-wrap: wrap; gap: 16px; padding: 10px 0; color: #b6cfe2; font-size: 12px; }
+.sdn-infrastructure-controls label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.sdn-infrastructure-controls input { accent-color: #38bdf8; }
+.sdn-legend-host { width: 11px; height: 11px; display: inline-block; background: #34d399; }
+.sdn-legend-control { width: 20px; display: inline-block; border-top: 2px dashed #c084fc; }
+.sdn-inspector { min-width: 0; }
+.sdn-detail dd { overflow-wrap: anywhere; }

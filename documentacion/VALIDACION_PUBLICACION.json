@@ -1,0 +1,13 @@
+{
+  "fecha": "2026-11-10",
+  "base_git": "84312a592be0a0672e6e91b875f461feb83580fd",
+  "pruebas_python": 55,
+  "pruebas_javascript": 25,
+  "pruebas_ml_sinteticas": 3,
+  "archivos_fuente_interfaz_comparados": 53,
+  "codigo_interfaz_coincide": true,
+  "revision_archivos_publicables": "Sin CSV, pesos, registros, entornos, archivos grandes ni patrones de credenciales en los archivos revisados.",
+  "consolas_interactivas": "Funcionamiento de ambas confirmado por el usuario tras correccion v1.1.",
+  "aplicacion_rutas_gui_al_trafico": "Pendiente por decision del usuario; no se instala forwarding desde el comparador.",
+  "verificacion_vm_administrativa": false
+}
